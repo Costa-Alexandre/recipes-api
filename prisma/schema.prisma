@@ -1,0 +1,234 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["countries", "ingredients", "markets", "recipes", "users"]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model countries {
+  id                    Int                 @id @default(autoincrement())
+  country_code          String              @unique @db.VarChar(2)
+  short_country_name    String              @unique @db.VarChar
+  official_country_name String?             @unique @db.VarChar
+  fk_currency_id        Int?
+  currencies            currencies?         @relation(fields: [fk_currency_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  country_languages     country_languages[]
+  markets_units         markets_units[]
+
+  @@index([country_code])
+  @@schema("countries")
+}
+
+model country_languages {
+  fk_country_id  Int
+  fk_language_id Int
+  countries      countries @relation(fields: [fk_country_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  languages      languages @relation(fields: [fk_language_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([fk_country_id, fk_language_id])
+  @@schema("countries")
+}
+
+model currencies {
+  id            Int         @id @default(autoincrement())
+  currency_code String      @unique @db.VarChar(3)
+  currency_name String      @db.VarChar
+  symbol        String      @db.VarChar
+  countries     countries[]
+
+  @@schema("countries")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model languages {
+  id                Int                 @id @default(autoincrement())
+  language_code     String?             @db.VarChar(2)
+  language_name     String              @db.VarChar
+  country_languages country_languages[]
+
+  @@index([language_code])
+  @@schema("countries")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ingredient_prices_log {
+  id                  BigInt        @id @default(autoincrement())
+  fk_ingredient_id    Int
+  fk_market_unit_id   Int
+  log_date            DateTime      @db.Date
+  price               Decimal       @db.Decimal(10, 2)
+  discount_percentage Decimal?      @default(0) @db.Decimal(3, 2)
+  ingredients         ingredients   @relation(fields: [fk_ingredient_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  markets_units       markets_units @relation(fields: [fk_market_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([fk_ingredient_id, discount_percentage])
+  @@index([fk_ingredient_id])
+  @@index([fk_ingredient_id, price])
+  @@index([fk_market_unit_id])
+  @@index([log_date])
+  @@schema("ingredients")
+}
+
+model ingredients {
+  id                    Int                     @id @default(autoincrement())
+  ingredient            String                  @unique @db.VarChar
+  fk_type_id            Int?                    @default(0)
+  fk_measure_unit_id    Int                     @db.SmallInt
+  ingredient_prices_log ingredient_prices_log[]
+  measure_units         measure_units           @relation(fields: [fk_measure_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types                 types?                  @relation(fields: [fk_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  recipes_ingredients   recipes_ingredients[]
+
+  @@index([fk_type_id])
+  @@index([ingredient])
+  @@schema("ingredients")
+}
+
+model measure_units {
+  id          Int           @id @default(autoincrement()) @db.SmallInt
+  unit        String        @unique @db.VarChar
+  ingredients ingredients[]
+
+  @@schema("ingredients")
+}
+
+model types {
+  id          Int           @id @default(autoincrement())
+  type        String        @unique @db.VarChar
+  ingredients ingredients[]
+
+  @@schema("ingredients")
+}
+
+model delivery_contact {
+  id                Int           @id @default(autoincrement())
+  fk_market_unit_id Int
+  site              String?       @db.VarChar
+  phone             String?       @db.VarChar
+  markets_units     markets_units @relation(fields: [fk_market_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([fk_market_unit_id])
+  @@schema("markets")
+}
+
+model markets {
+  id            Int             @id @default(autoincrement())
+  market        String          @db.VarChar
+  observations  String?         @db.VarChar
+  markets_units markets_units[]
+
+  @@schema("markets")
+}
+
+model markets_units {
+  id                    Int                     @id @default(autoincrement())
+  fk_market_id          Int?
+  market_unit_name      String?                 @db.VarChar
+  address               String?                 @db.VarChar
+  coordinates           Unsupported("point")?
+  fk_country_id         Int
+  ingredient_prices_log ingredient_prices_log[]
+  delivery_contact      delivery_contact[]
+  countries             countries               @relation(fields: [fk_country_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  markets               markets?                @relation(fields: [fk_market_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([fk_market_id])
+  @@schema("markets")
+}
+
+model categories {
+  id                Int                 @id @default(autoincrement())
+  category          String              @unique @db.VarChar
+  recipe_categories recipe_categories[]
+
+  @@schema("recipes")
+}
+
+model levels {
+  id      Int       @id @default(autoincrement()) @db.SmallInt
+  level   String    @unique @db.VarChar
+  recipes recipes[]
+
+  @@schema("recipes")
+}
+
+model recipe_categories {
+  fk_recipe_id   BigInt
+  fk_category_id Int
+  categories     categories @relation(fields: [fk_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  recipes        recipes    @relation(fields: [fk_recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([fk_recipe_id, fk_category_id])
+  @@schema("recipes")
+}
+
+model recipes {
+  id                  BigInt                @id @default(autoincrement())
+  fk_user_id          String                @db.Uuid
+  title               String                @db.VarChar
+  fk_level_id         Int?                  @default(0) @db.SmallInt
+  image               String?               @db.VarChar
+  instructions        String?               @db.VarChar
+  created_at          DateTime?             @default(now()) @db.Timestamp(6)
+  modified_at         DateTime?             @default(now()) @db.Timestamp(6)
+  recipe_categories   recipe_categories[]
+  levels              levels?               @relation(fields: [fk_level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users               users                 @relation(fields: [fk_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  recipes_ingredients recipes_ingredients[]
+  favorite_recipes    favorite_recipes[]
+
+  @@index([fk_level_id])
+  @@index([fk_user_id, created_at])
+  @@index([fk_user_id])
+  @@index([title])
+  @@schema("recipes")
+}
+
+model recipes_ingredients {
+  fk_ingredient_id Int
+  fk_recipe_id     BigInt
+  quantity         Decimal?    @db.Decimal(8, 3)
+  ingredients      ingredients @relation(fields: [fk_ingredient_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  recipes          recipes     @relation(fields: [fk_recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([fk_ingredient_id, fk_recipe_id])
+  @@schema("recipes")
+}
+
+model favorite_recipes {
+  fk_user_id   String    @db.Uuid
+  fk_recipe_id BigInt
+  favorited_at DateTime? @default(now()) @db.Timestamp(6)
+  recipes      recipes   @relation(fields: [fk_recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users        users     @relation(fields: [fk_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([fk_user_id, fk_recipe_id])
+  @@index([favorited_at])
+  @@schema("users")
+}
+
+model users {
+  id               String             @id @db.Uuid
+  email            String             @unique @db.VarChar
+  username         String             @db.VarChar
+  full_name        String?            @db.VarChar
+  address          String?            @db.VarChar
+  city             String?            @db.VarChar
+  country          String             @db.VarChar
+  avatar           String?            @db.VarChar
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  modified_at      DateTime?          @default(now()) @db.Timestamp(6)
+  recipes          recipes[]
+  favorite_recipes favorite_recipes[]
+
+  @@index([city, country])
+  @@index([created_at])
+  @@index([email])
+  @@index([username])
+  @@schema("users")
+}
