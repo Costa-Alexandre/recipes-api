@@ -16,6 +16,7 @@ model Country {
   currencyId Int
   languages  Language[]
   marketUnit MarketUnit[]
+  User       User[]
 }
 
 model Currency {
@@ -132,18 +133,26 @@ model RecipeLevel {
   recipe Recipe[]
 }
 
-// users
+// USERS
 
 model User {
-  id        String   @id
+  id        String   @id @default(uuid())
   email     String   @unique
   username  String
   fullName  String?
   address   String?
   city      String?
-  country   String
+  country   Country  @relation(fields: [countryId], references: [id])
   avatar    String?
   createdAt DateTime
   updatedAt DateTime
+  role      Role     @default(USER)
   recipe    Recipe[]
+  countryId Int
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  USER
 }
