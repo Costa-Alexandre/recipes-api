@@ -22,17 +22,16 @@ model Country {
 model Currency {
   id       Int       @id @default(autoincrement())
   code     String    @unique
-  currency String
+  currency String    @unique
   symbol   String
   country  Country[]
 }
 
 model Language {
-  id        Int       @id @default(autoincrement())
-  code      String    @unique
-  language  String    @unique
-  country   Country[]
-  countryId Int?
+  id       Int       @id @default(autoincrement())
+  code     String    @unique
+  language String    @unique
+  country  Country[]
 }
 
 // INGREDIENTS
