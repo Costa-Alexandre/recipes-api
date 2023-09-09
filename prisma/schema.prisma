@@ -16,7 +16,7 @@ model Country {
   currencyId Int
   languages  Language[]
   marketUnit MarketUnit[]
-  User       User[]
+  user       User[]
 }
 
 model Currency {
@@ -36,13 +36,14 @@ model Language {
 
 // INGREDIENTS
 model Ingredient {
-  id                   Int                    @id @default(autoincrement())
+  id                   String                 @id @default(uuid())
   ingredient           String                 @unique
   type                 IngredientType         @relation(fields: [typeId], references: [id])
   typeId               Int
   unit                 MeasureUnit            @relation(fields: [unitId], references: [id])
   unitId               Int
   ingredientsOnRecipes IngredientsOnRecipes[]
+  priceLogs            PriceLog[]
 }
 
 model MeasureUnit {
@@ -60,7 +61,17 @@ model IngredientType {
 model Utensil {
   id      Int      @id
   utensil String   @unique
-  Recipe  Recipe[]
+  recipe  Recipe[]
+}
+
+model PriceLog {
+  id           String     @id @default(uuid())
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId String
+  marketUnit   MarketUnit @relation(fields: [marketUnitId], references: [id])
+  marketUnitId String
+  date         DateTime   @db.Date
+  price        Decimal    @db.Money
 }
 
 // MARKETS
@@ -73,7 +84,7 @@ model Market {
 }
 
 model MarketUnit {
-  id          Int               @id @default(autoincrement())
+  id          String            @id @default(uuid())
   unitName    String            @unique
   address     String?
   coordinates String?
@@ -82,20 +93,21 @@ model MarketUnit {
   country     Country           @relation(fields: [countryId], references: [id])
   countryId   Int
   contacts    DeliveryContact[]
+  PriceLog    PriceLog[]
 }
 
 model DeliveryContact {
   id           Int        @id @default(autoincrement())
   site         String?
   phone        String?
-  MarketUnit   MarketUnit @relation(fields: [marketUnitId], references: [id])
-  marketUnitId Int
+  marketUnit   MarketUnit @relation(fields: [marketUnitId], references: [id])
+  marketUnitId String
 }
 
 // RECIPES
 
 model Recipe {
-  id                   Int                    @id @default(autoincrement())
+  id                   String                 @id @default(uuid())
   title                String
   author               User                   @relation(fields: [authorId], references: [id])
   authorId             String
@@ -112,9 +124,9 @@ model Recipe {
 
 model IngredientsOnRecipes {
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId Int
+  ingredientId String
   recipe       Recipe     @relation(fields: [recipeId], references: [id])
-  recipeId     Int
+  recipeId     String
   quantity     Int
 
   @@id([ingredientId, recipeId])
@@ -135,19 +147,21 @@ model RecipeLevel {
 // USERS
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String
-  fullName  String?
-  address   String?
-  city      String?
-  country   Country  @relation(fields: [countryId], references: [id])
-  avatar    String?
-  createdAt DateTime
-  updatedAt DateTime
-  role      Role     @default(USER)
-  recipe    Recipe[]
-  countryId Int
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String
+  hashPassword String
+  saltPassword String
+  fullName     String?
+  address      String?
+  city         String?
+  country      Country  @relation(fields: [countryId], references: [id])
+  avatar       String?
+  createdAt    DateTime
+  updatedAt    DateTime
+  role         Role     @default(USER)
+  recipe       Recipe[]
+  countryId    Int
 }
 
 enum Role {
