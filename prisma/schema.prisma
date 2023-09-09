@@ -151,7 +151,6 @@ model User {
   email        String   @unique
   username     String
   hashPassword String
-  saltPassword String
   fullName     String?
   address      String?
   city         String?
