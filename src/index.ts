@@ -1,6 +1,5 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import express from 'express';
-import { Request, Response } from 'express';
 import { CountryRoutes, UserRoutes } from './routes';
 import swaggerDocs from './docs/swagger';
 
