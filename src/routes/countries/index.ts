@@ -17,27 +17,63 @@ interface LanguageIds {
 const router = express.Router();
 
 router.route(`/`)
+  /**
+   *  @openapi
+   *  /countries:
+   *    get:
+   *      tags:
+   *        - Countries
+   *      description: Get all countries
+   *      responses:
+   *        200:
+   *          description: Success
+   */
   .get(async (req: Request, res: Response) => {
     const countries = await prisma.country.findMany()
     res.json(countries)
   })
+  /**
+   *  @openapi
+   *  /countries:
+   *    post:
+   *      tags:
+   *        - Countries
+   *      summary: Add a new country
+   *      description: Add a new country
+   *      requestBody:
+   *        description: Country object
+   *        required: true
+   *      responses:
+   *        200:
+   *          description: Success
+   *        500:
+   *          description: Internal Server Error
+   *                
+   */
   .post(async (req: Request<{}, {}, CreateCountryRequest>, res: Response) => {
     const { country, code, currencyId, languages = [] } = req.body
-    const result = await prisma.country.create({
-      data: {
-        code,
-        country,
-        currency: { connect: { id: currencyId } },
-        languages: { connect: languages.map((languageId) => ({ id: languageId })) }
-      },
-      select: {
-        country: true,
-        code: true,
-        currency: { select: { currency: true } },
-        languages: { select: { language: true } }
-      }
-    })
-    res.json(result)
+
+    try {
+
+      const result = await prisma.country.create({
+        data: {
+          code,
+          country,
+          currency: { connect: { id: currencyId } },
+          languages: { connect: languages.map((languageId) => ({ id: languageId })) }
+        },
+        select: {
+          country: true,
+          code: true,
+          currency: { select: { currency: true } },
+          languages: { select: { language: true } }
+        }
+      })
+      res.json(result)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
   })
 
 

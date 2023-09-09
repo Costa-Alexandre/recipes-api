@@ -2,7 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import express from 'express';
 import { Request, Response } from 'express';
 import CountryRoutes from './routes/countries';
-
+import swaggerDocs from './docs/swagger';
 
 export const prisma = new PrismaClient();
 const app = express();
@@ -15,4 +15,5 @@ app.use('/countries', CountryRoutes);
 
 const server = app.listen(port, () => {
   console.log('Server ready at: http://localhost:3000')
+  swaggerDocs(app, 3000)
 })
