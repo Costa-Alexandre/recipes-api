@@ -77,10 +77,11 @@ model PriceLog {
 // MARKETS
 
 model Market {
-  id           Int          @id @default(autoincrement())
-  market       String       @unique
+  id           Int            @id @default(autoincrement())
+  market       String         @unique
   observations String?
   units        MarketUnit[]
+  ShoppingList ShoppingList[]
 }
 
 model MarketUnit {
@@ -107,19 +108,21 @@ model DeliveryContact {
 // RECIPES
 
 model Recipe {
-  id                   String                 @id @default(uuid())
-  title                String
-  author               User                   @relation(fields: [authorId], references: [id])
-  authorId             String
-  difficulty           RecipeLevel?           @relation(fields: [recipeLevelId], references: [id])
-  recipeLevelId        Int?
-  category             Category[]
-  image                String?
-  instructions         String?
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
-  ingredientsOnRecipes IngredientsOnRecipes[]
-  utensils             Utensil[]
+  id                    String                  @id @default(uuid())
+  title                 String
+  author                User                    @relation(fields: [authorId], references: [id])
+  authorId              String
+  difficulty            RecipeLevel?            @relation(fields: [recipeLevelId], references: [id])
+  recipeLevelId         Int?
+  servings              Int
+  category              Category[]
+  image                 String?
+  instructions          String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  ingredientsOnRecipes  IngredientsOnRecipes[]
+  utensils              Utensil[]
+  RecipesOnShoppingList RecipesOnShoppingList[]
 }
 
 model IngredientsOnRecipes {
@@ -144,30 +147,49 @@ model RecipeLevel {
   recipe Recipe[]
 }
 
+// SHOPPING LIST
+
+model ShoppingList {
+  id                    String                  @id @default(uuid())
+  title                 String                  @default("My Shopping List")
+  author                User                    @relation(fields: [authorId], references: [id])
+  authorId              String
+  recipesOnShoppingList RecipesOnShoppingList[]
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  preferredMarkets      Market[]
+  selectionCriteria     SelectionCriteria?
+}
+
+model RecipesOnShoppingList {
+  recipe         Recipe       @relation(fields: [recipeId], references: [id])
+  recipeId       String
+  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id])
+  shoppingListId String
+  servings       Int
+
+  @@id([recipeId, shoppingListId])
+}
+
 // USERS
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
-  username       String   @unique
+  id             String         @id @default(uuid())
+  email          String         @unique
+  username       String         @unique
   hashedPassword String
   fullName       String?
   address        String?
   city           String?
-  country        Country  @relation(fields: [countryId], references: [id])
+  country        Country        @relation(fields: [countryId], references: [id])
   avatar         String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  role           Role     @default(USER)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  role           Role           @default(USER)
   recipe         Recipe[]
   countryId      Int
   Token          Token[]
-}
-
-enum Role {
-  ADMIN
-  EDITOR
-  USER
+  ShoppingList   ShoppingList[]
 }
 
 model Token {
@@ -176,4 +198,16 @@ model Token {
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  USER
+}
+
+enum SelectionCriteria {
+  PRICE
+  DISTANCE
+  AVAILABILITY
 }
