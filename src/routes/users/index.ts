@@ -20,23 +20,9 @@ type RefreshToken = {
 
 
 router.route(`/`)
-  /**
-   *  @openapi
-   *  /countries:
-   *    get:
-   *      tags:
-   *        - Users
-   *      description: Get all users
-   *      responses:
-   *        200:
-   *          description: Success
-   */
-  .get(authenticateToken, async (req: RequestWithUser, res: Response) => {
+
+  .get(authenticateToken("ADMIN"), async (req: RequestWithUser, res: Response) => {
     try {
-      const user = req.user;
-      if (!user || typeof user === 'string') return res.status(401).json({ error: 'Unauthorized' });
-      const { role } = user;
-      if (role !== 'ADMIN') return res.status(401).json({ error: 'Unauthorized' });
       const users = await prisma.user.findMany();
       return res.status(200).json(users);
     } catch (error) {
@@ -119,7 +105,7 @@ router.route(`/login`)
   })
 
 router.route(`/:username`)
-  .get(authenticateToken, async (req: RequestWithUser, res: Response) => {
+  .get(authenticateToken("USER"), async (req: RequestWithUser, res: Response) => {
     try {
       const loggedUser = req.user;
       if (!loggedUser || typeof loggedUser === 'string') return res.status(401).json({ error: 'Unauthorized' });

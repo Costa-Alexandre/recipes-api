@@ -29,7 +29,7 @@ model Currency {
 
 model Language {
   id       Int       @id @default(autoincrement())
-  code     String    @unique
+  code     String    @unique @db.VarChar(2)
   language String    @unique
   country  Country[]
 }

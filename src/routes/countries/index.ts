@@ -17,39 +17,12 @@ interface LanguageIds {
 const router = express.Router();
 
 router.route(`/`)
-  /**
-   *  @openapi
-   *  /countries:
-   *    get:
-   *      tags:
-   *        - Countries
-   *      description: Get all countries
-   *      responses:
-   *        200:
-   *          description: Success
-   */
+
   .get(async (req: Request, res: Response) => {
     const countries = await prisma.country.findMany()
     res.json(countries)
   })
-  /**
-   *  @openapi
-   *  /countries:
-   *    post:
-   *      tags:
-   *        - Countries
-   *      summary: Add a new country
-   *      description: Add a new country
-   *      requestBody:
-   *        description: Country object
-   *        required: true
-   *      responses:
-   *        200:
-   *          description: Success
-   *        500:
-   *          description: Internal Server Error
-   *                
-   */
+
   .post(async (req: Request<{}, {}, CreateCountryRequest>, res: Response) => {
     const { country, code, currencyId, languages = [] } = req.body
 

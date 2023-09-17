@@ -1,0 +1,141 @@
+openapi: '3.0.2'
+info:
+  title: Recipes API
+  version: '1.0'
+servers:
+  - url: http://localhost:3000
+
+components:
+  schemas:
+    LanguagesWithCountries:
+      type: object
+      required:
+        - code
+        - language
+      properties:
+        id:
+          type: integer
+          example: 10
+          format: int64
+        code:
+          type: string
+          example: en
+        language:
+          type: string
+          example: English
+        countries:
+          type: array
+          items:
+            type: string
+          example:
+            - United States
+            - United Kingdom
+            - Canada
+    Languages:
+      type: object
+      required:
+        - code
+        - language
+      properties:
+        id:
+          type: integer
+          example: 10
+          format: int64
+        code:
+          type: string
+          example: en
+        language:
+          type: string
+          example: English
+
+    Status500:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Internal Server Error
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: JWT authorization of an API
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+  /languages:
+    get:
+      tags:
+        - Languages
+      description: Return all languages, with countries that speak them
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/LanguagesWithCountries'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status500'
+      security:
+        - bearerAuth: []
+
+    post:
+      tags:
+        - Languages
+      description: 'Add a new language'
+      operationId: 'addLanguage'
+      requestBody:
+        description: Language object that needs to be added
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - language
+              properties:
+                code:
+                  type: string
+                  example: en
+                language:
+                  type: string
+              example:
+                code: en
+                language: English
+
+      responses:
+        '200':
+          description: Successfully added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Languages'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status500'
+      security:
+        - bearerAuth: []
