@@ -287,9 +287,9 @@ To automatically generate an Entity-Relationship Diagram (ERD) from your Prisma 
 2. **Convert SQL to .dbml:**
    Run the following command to convert the SQL script to a .dbml file:
 
-`npx -p @dbml/cli sql2dbml --postgres-legacy dump.sql -o mydatabase.dbml`
+`npx -p @dbml/cli sql2dbml --postgres dump.sql -o mydatabase.dbml`
 
-Note: Using the `--postgres` flag instead of `--postgres-legacy` will generate a .dbml file with a different syntax. This syntax is currently not supported by dbdocs/0.8.1.
+Note: Using the `--postgres` flag will generate a .dbml file with a different syntax. This syntax is currently not supported by dbdocs/0.8.1 or prior versions. Use the `--postgres-legacy` flag instead.
 
 3. **Log in to dbdocs.io:**
 
