@@ -1,12 +1,11 @@
 import express from 'express';
-import { Request, Response } from 'express';
-import { Language } from '@prisma/client';
-import { mock } from 'inatic'
+import { Prisma } from '@prisma/client';
+import { Response, NextFunction } from 'express';
 import { RequestWithUser } from '../../types';
-import { prisma } from '../../index';
-// TODO: restrict access to authenticated users
-import { authenticateToken } from '../users/middleware';
+import { prisma } from '../../server';
+import { authenticateToken } from '../users/auth';
 import { z } from 'zod';
+import { logger } from '../../lib/logger'
 
 const languageRequiredSchema = {
   code: z.string().regex(/^[a-z]{2}$/),
@@ -32,12 +31,10 @@ const languageDELETESchema = z.object({
   id: z.coerce.number(),
 })
 
-const status500error = { error: 'Internal server error' }
-
 const router = express.Router();
 
 router.route(`/`)
-  .get(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response) => {
+  .get(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const languages = await prisma.language.findMany({
         include: {
@@ -63,15 +60,15 @@ router.route(`/`)
 
       return res.status(200).json(languagesWithCountry)
     } catch (error) {
-      console.log(error)
-      res.status(500).json(status500error)
+      next(error)
     }
   })
-  .post(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response) => {
+  .post(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const { code, language } = req.body;
-    const result = languagePOSTSchema.safeParse({ code, language })
-    if (!result.success) {
-      return res.status(400).json({ error: result.error })
+    const validationResult = languagePOSTSchema.safeParse({ code, language })
+    if (!validationResult.success) {
+      logger.warn(`Schema validation error. ${validationResult.error}`)
+      return res.status(400).json({ error: `Schema validation error.` })
     }
 
     try {
@@ -85,18 +82,22 @@ router.route(`/`)
       res.status(200).json(newLanguage)
 
     } catch (error) {
-      console.log(error)
-      res.status(500).json(status500error)
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          return res.status(400).json({ error: `There is a unique constraint violation, a new language cannot be created` })
+        }
+      }
+      next(error)
     }
   })
 
-
 router.route(`/:id`)
-  .put(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response) => {
+  .put(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const { body: { code, language }, params: { id } } = req;
     const validationResult = languagePUTSchema.safeParse({ id, code, language })
     if (!validationResult.success) {
-      return res.status(400).json({ error: 'Validation error', details: validationResult.error })
+      logger.warn(`Schema validation error. ${validationResult.error}`)
+      return res.status(400).json({ error: `Schema validation error.` })
     }
 
     const { data: { id: idParsed, code: codeParsed, language: languageParsed } } = validationResult
@@ -115,15 +116,24 @@ router.route(`/:id`)
       res.status(200).json(updatedLanguage)
 
     } catch (error) {
-      console.log(error)
-      res.status(500).json(status500error)
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        logger.warn(error.message)
+        if (error.code === 'P2002') {
+          return res.status(400).json({ error: `There is a unique constraint violation, this language cannot be updated` })
+        }
+        if (error.code === 'P2025') {
+          return res.status(404).json({ error: `The language with id ${idParsed} was not found` })
+        }
+      }
+      next(error)
     }
   })
-  .delete(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response) => {
+  .delete(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const validationResult = languageDELETESchema.safeParse({ id })
     if (!validationResult.success) {
-      return res.status(400).json({ error: 'Validation error', details: validationResult.error })
+      logger.warn(`Schema validation error. ${validationResult.error}`)
+      return res.status(400).json({ error: 'Validation error' })
     }
 
     const { data: { id: idParsed } } = validationResult
@@ -138,8 +148,13 @@ router.route(`/:id`)
       res.status(200).json(deletedLanguage)
 
     } catch (error) {
-      console.log(error)
-      res.status(500).json(status500error)
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        logger.warn(error.message)
+        if (error.code === 'P2025') {
+          return res.status(404).json({ error: `The language with id ${idParsed} was not found` })
+        }
+      }
+      next(error)
     }
   })
 

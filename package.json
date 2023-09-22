@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd src/index.ts",
+    "dev": "tsnd src/server.ts",
     "inatic": "inatic"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
     "@types/node": "^20.5.7",
     "@types/swagger-jsdoc": "^6.0.1",
     "@types/swagger-ui-express": "^4.1.3",
+    "@types/winston": "^2.4.4",
     "@types/yaml": "^1.9.7",
     "@types/zxcvbn": "^4.4.2",
     "inatic": "^0.11.1",
@@ -27,11 +28,14 @@
   },
   "dependencies": {
     "@prisma/client": "^5.2.0",
+    "@types/express-winston": "^4.0.0",
     "bcrypt": "^5.1.1",
     "express": "^4.18.2",
+    "express-winston": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
+    "winston": "^3.10.0",
     "yaml": "^2.3.2",
     "zod": "^3.22.2",
     "zxcvbn": "^4.4.2"

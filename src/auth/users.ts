@@ -1,12 +1,12 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import { RequestWithUser } from '../../types';
+import { RequestWithUser } from '../types';
 import type { User } from '@prisma/client';
-import { prisma } from '../../index';
+import { prisma } from '../server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import zxcvbn from 'zxcvbn';
-import { authenticateToken } from './middleware';
+import { authenticateToken } from '../routes/users/auth';
 
 const router = express.Router();
 const jwtSecret = process.env.JWT_SECRET || '';

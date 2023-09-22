@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from 'jsonwebtoken';
+import { logger } from '../../lib/logger'
 
 interface RequestWithUser extends Request {
   user?: string | JwtPayload;
@@ -11,13 +12,16 @@ export function authenticateToken(minRole = 'ADMIN') {
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(' ')[1];
 
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) {
+      const message = 'Unauthorized: Authentication token missing'
+      logger.warn(message)
+      return res.status(401).json({ error: message });
+    }
 
     const jwtSecret = process.env.JWT_SECRET || '';
     try {
       const user = jwt.verify(token, jwtSecret);
       const { role: userRole } = user as JwtPayload;
-      console.log(`Needs to be: ${minRole}. User is: ${userRole}`)
       switch (userRole) {
         case 'ADMIN':
           break;
@@ -26,14 +30,15 @@ export function authenticateToken(minRole = 'ADMIN') {
         case 'USER':
           if (minRole === 'USER') break;
         default:
-          return res.status(401).json({ error: 'Unauthorized' });
+          const message = "Forbidden: Insufficient privileges to access this resource"
+          logger.warn(message)
+          return res.status(403).json({ error: message });
       }
 
       req.user = user
       next();
     } catch (error) {
-      console.log(error)
-      return res.status(401).json({ error: 'Unauthorized' });
+      return next(error);
     }
   }
 }

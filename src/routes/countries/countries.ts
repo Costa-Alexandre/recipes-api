@@ -1,6 +1,6 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import { prisma } from '../../index';
+import { prisma } from '../../server';
 
 interface CreateCountryRequest {
   id: number;

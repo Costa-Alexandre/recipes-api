@@ -1,13 +1,13 @@
 import { Express, Request, Response } from 'express'
-// import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yaml'
 import fs from 'fs'
 import path from 'path'
+import { logger } from '../lib/logger'
 
 const yamlFilePath = path.resolve(__dirname, './recipesSchema.yml')
 const swaggerDocument = YAML.parse(fs.readFileSync(yamlFilePath, 'utf8'))
-function swaggerDocs(app: Express, port: number) {
+function swaggerDocs(app: Express, port: string) {
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
   app.get('docs.json', (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ function swaggerDocs(app: Express, port: number) {
     res.send(swaggerDocument)
   })
 
-  console.log('docs available at http://localhost:3000/docs')
+  logger.info(`Docs available at: http://localhost:${port}/docs`)
 }
 
 export default swaggerDocs

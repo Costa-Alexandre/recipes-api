@@ -1,6 +1,6 @@
-import UserRoutes from './users'
-import CountryRoutes from './countries'
-import LanguageRoutes from './languages'
+import UserRoutes from '../auth/users'
+import CountryRoutes from './countries/countries'
+import LanguageRoutes from './languages/languages'
 
 export {
   UserRoutes,
