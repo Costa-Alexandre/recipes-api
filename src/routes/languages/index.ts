@@ -91,4 +91,57 @@ router.route(`/`)
   })
 
 
+router.route(`/:id`)
+  .put(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response) => {
+    const { body: { code, language }, params: { id } } = req;
+    const validationResult = languagePUTSchema.safeParse({ id, code, language })
+    if (!validationResult.success) {
+      return res.status(400).json({ error: 'Validation error', details: validationResult.error })
+    }
+
+    const { data: { id: idParsed, code: codeParsed, language: languageParsed } } = validationResult
+
+    try {
+      const updatedLanguage = await prisma.language.update({
+        where: {
+          id: idParsed
+        },
+        data: {
+          code: codeParsed,
+          language: languageParsed
+        }
+      })
+
+      res.status(200).json(updatedLanguage)
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).json(status500error)
+    }
+  })
+  .delete(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response) => {
+    const { id } = req.params;
+    const validationResult = languageDELETESchema.safeParse({ id })
+    if (!validationResult.success) {
+      return res.status(400).json({ error: 'Validation error', details: validationResult.error })
+    }
+
+    const { data: { id: idParsed } } = validationResult
+
+    try {
+      const deletedLanguage = await prisma.language.delete({
+        where: {
+          id: idParsed
+        }
+      })
+
+      res.status(200).json(deletedLanguage)
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).json(status500error)
+    }
+  })
+
+
 export default router;
