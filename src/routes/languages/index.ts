@@ -8,11 +8,28 @@ import { prisma } from '../../index';
 import { authenticateToken } from '../users/middleware';
 import { z } from 'zod';
 
-const languageSchema = z.object({
-  id: z.coerce.number().optional(),
+const languageRequiredSchema = {
   code: z.string().regex(/^[a-z]{2}$/),
   language: z.string(),
+}
+const languageGETSchema = z.object({
+  id: z.coerce.number().optional(),
+  ...languageRequiredSchema,
   country: z.array(z.string()).optional()
+})
+
+const languagePOSTSchema = z.object({
+  ...languageRequiredSchema
+})
+
+const languagePUTSchema = z.object({
+  id: z.coerce.number(),
+  code: z.string().regex(/^[a-z]{2}$/).optional(),
+  language: z.string().optional(),
+})
+
+const languageDELETESchema = z.object({
+  id: z.coerce.number(),
 })
 
 const status500error = { error: 'Internal server error' }
@@ -39,7 +56,7 @@ router.route(`/`)
         }
       })
 
-      const result = z.array(languageSchema).safeParse(languagesWithCountry)
+      const result = z.array(languageGETSchema).safeParse(languagesWithCountry)
       if (!result.success) {
         throw new Error(`Schema validation failed.`)
       }
@@ -52,7 +69,7 @@ router.route(`/`)
   })
   .post(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response) => {
     const { code, language } = req.body;
-    const result = languageSchema.safeParse({ code, language })
+    const result = languagePOSTSchema.safeParse({ code, language })
     if (!result.success) {
       return res.status(400).json({ error: result.error })
     }
