@@ -47,13 +47,57 @@ components:
         language:
           type: string
           example: English
-
-    Status500:
-      type: object
-      properties:
-        error:
-          type: string
-          example: Internal Server Error
+  responses:
+    '400':
+      description: 'Schema validation error'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Schema validation error
+    '401':
+      description: 'Unauthorized: Authentication token missing'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: 'Unauthorized: Authentication token missing'
+    '403':
+      description: 'Forbidden: Insufficient privileges to access this resource'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: 'Forbidden: Insufficient privileges to access this resource'
+    '404':
+      description: 'Not Found'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    '500':
+      description: 'Internal Server Error'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Internal Server Error
 
   securitySchemes:
     bearerAuth:
@@ -91,12 +135,14 @@ paths:
                 items:
                   type: object
                   $ref: '#/components/schemas/LanguagesWithCountries'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status500'
+          $ref: '#/components/responses/500'
       security:
         - bearerAuth: []
 
@@ -131,11 +177,124 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Languages'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
         '500':
-          description: Internal Server Error
+          $ref: '#/components/responses/500'
+      security:
+        - bearerAuth: []
+
+  /languages/{id}:
+    put:
+      tags:
+        - Languages
+      description: 'Update a language'
+      parameters:
+        - name: id
+          in: path
+          description: ID of language to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Language object that needs to be updated
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - language
+              properties:
+                code:
+                  type: string
+                  example: en
+                language:
+                  type: string
+              example:
+                code: en
+                language: English
+      responses:
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Status500'
+                $ref: '#/components/schemas/Languages'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Languages
+      description: 'Delete a language'
+      parameters:
+        - name: id
+          in: path
+          description: ID of language to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Languages'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - bearerAuth: []
+    get:
+      tags:
+        - Languages
+      description: 'Get all countries that speak a language'
+      parameters:
+        - name: id
+          in: path
+          description: ID of language to get countries for
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguagesWithCountries'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
       security:
         - bearerAuth: []

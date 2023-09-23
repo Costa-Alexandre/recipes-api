@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from 'jsonwebtoken';
-import { logger } from '../../lib/logger'
+import { logger } from '../lib/logger'
 
 interface RequestWithUser extends Request {
   user?: string | JwtPayload;

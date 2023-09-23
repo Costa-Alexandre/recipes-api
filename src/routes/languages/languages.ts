@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { Response, NextFunction } from 'express';
 import { RequestWithUser } from '../../types';
 import { prisma } from '../../server';
-import { authenticateToken } from '../users/auth';
+import { authenticateToken } from '../../auth/auth';
 import { z } from 'zod';
 import { logger } from '../../lib/logger'
 
@@ -94,6 +94,7 @@ router.route(`/`)
 router.route(`/:id`)
   .put(authenticateToken("EDITOR"), async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const { body: { code, language }, params: { id } } = req;
+    console.log('id', id, typeof id)
     const validationResult = languagePUTSchema.safeParse({ id, code, language })
     if (!validationResult.success) {
       logger.warn(`Schema validation error. ${validationResult.error}`)
@@ -122,7 +123,7 @@ router.route(`/:id`)
           return res.status(400).json({ error: `There is a unique constraint violation, this language cannot be updated` })
         }
         if (error.code === 'P2025') {
-          return res.status(404).json({ error: `The language with id ${idParsed} was not found` })
+          return res.status(404).json({ error: `The language with id [${idParsed}] was not found` })
         }
       }
       next(error)
@@ -133,7 +134,7 @@ router.route(`/:id`)
     const validationResult = languageDELETESchema.safeParse({ id })
     if (!validationResult.success) {
       logger.warn(`Schema validation error. ${validationResult.error}`)
-      return res.status(400).json({ error: 'Validation error' })
+      return res.status(400).json({ error: 'Schema validation error' })
     }
 
     const { data: { id: idParsed } } = validationResult
@@ -151,7 +152,54 @@ router.route(`/:id`)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         logger.warn(error.message)
         if (error.code === 'P2025') {
-          return res.status(404).json({ error: `The language with id ${idParsed} was not found` })
+          return res.status(404).json({ error: `The language with id [${idParsed}] was not found` })
+        }
+      }
+      next(error)
+    }
+  })
+  .get(authenticateToken("USER"), async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const validationResult = languageDELETESchema.safeParse({ id })
+    if (!validationResult.success) {
+      logger.warn(`Schema validation error. ${validationResult.error}`)
+      return res.status(400).json({ error: 'Schema validation error' })
+    }
+
+    const { data: { id: idParsed } } = validationResult
+
+    try {
+      const language = await prisma.language.findUniqueOrThrow({
+        where: {
+          id: idParsed
+        },
+        include: {
+          country: {
+            select: {
+              country: true
+            }
+          }
+        }
+      })
+
+      const languagesWithCountry = {
+        ...language,
+        country: language?.country.map((country) => country.country)
+      }
+
+      const validationResult = languageGETSchema.safeParse(languagesWithCountry)
+
+      if (!validationResult.success) {
+        logger.warn(`Schema validation error. ${validationResult.error}`)
+        throw new Error(`Schema validation failed.`)
+      }
+
+      return res.status(200).json(validationResult.data)
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        logger.warn(error.message)
+        if (error.code === 'P2025') {
+          return res.status(404).json({ error: `The language with id [${idParsed}] was not found` })
         }
       }
       next(error)
