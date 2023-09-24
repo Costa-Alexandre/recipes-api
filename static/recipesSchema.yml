@@ -4,6 +4,9 @@ info:
   version: '1.0'
 servers:
   - url: http://localhost:3000
+    description: Local server
+  - url: https://recipes-api-2023.ey.r.appspot.com/
+    description: Google Cloud App Engine
 
 components:
   schemas:
@@ -27,6 +30,9 @@ components:
           type: array
           items:
             type: string
+            maxLength: 32
+            pattern: ^example-[A-Za-z\s]+$
+            maxItems: 60
           example:
             - United States
             - United Kingdom
@@ -135,6 +141,7 @@ paths:
                 items:
                   type: object
                   $ref: '#/components/schemas/LanguagesWithCountries'
+                maxItems: 60
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -164,8 +171,13 @@ paths:
                 code:
                   type: string
                   example: en
+                  pattern: ^[a-z]+$
+                  maxLength: 2
                 language:
                   type: string
+                  example: English
+                  pattern: ^[A-Za-z\s]+$
+                  maxLength: 12
               example:
                 code: en
                 language: English

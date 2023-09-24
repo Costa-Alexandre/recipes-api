@@ -5,7 +5,7 @@ import fs from 'fs'
 import path from 'path'
 import { logger } from '../lib/logger'
 
-const yamlFilePath = path.resolve(__dirname, './recipesSchema.yml')
+const yamlFilePath = path.resolve('./static/recipesSchema.yml')
 const swaggerDocument = YAML.parse(fs.readFileSync(yamlFilePath, 'utf8'))
 function swaggerDocs(app: Express, port: string) {
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))

@@ -2,10 +2,11 @@
   "name": "recipes-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "tsnd src/server.ts",
-    "inatic": "inatic"
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,7 @@
     "bcrypt": "^5.1.1",
     "express": "^4.18.2",
     "express-winston": "^4.2.0",
+    "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",

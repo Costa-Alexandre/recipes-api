@@ -5,3 +5,4 @@ db_backups
 threat_model
 .DS_Store
 logs/*
+dist/*

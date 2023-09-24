@@ -3,11 +3,16 @@ import express, { ErrorRequestHandler } from 'express';
 import { CountryRoutes, UserRoutes, LanguageRoutes } from './routes';
 import swaggerDocs from './docs/swagger';
 import { reqLogger, errorLogger, logger } from './lib/logger';
+import https from 'https';
 
 
 export const prisma = new PrismaClient();
 const app = express();
 const port = process.env.PORT || '3000';
+const httpsOptions = {
+  cert: process.env.SSL_CERT,
+  key: process.env.SSL_KEY,
+}
 
 // Middlewares
 app.use(express.json());

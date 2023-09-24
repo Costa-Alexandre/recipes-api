@@ -271,7 +271,7 @@ These use cases demonstrate the core functionalities and features of the project
 
 Here is an Entity-Relationship Diagram (ERD) illustrating the key data models used in this project:
 
-![ERD Diagram](src/docs/Recipes.png)
+![ERD Diagram](static/Recipes.png)
 
 This diagram provides an overview of the data structure and relationships within the project's database.
 
