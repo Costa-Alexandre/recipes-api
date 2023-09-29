@@ -1,8 +1,3 @@
 node_modules
-# Keep environment variables out of version control
+dist
 .env
-db_backups
-threat_model
-.DS_Store
-logs/*
-dist/*
