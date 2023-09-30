@@ -3,7 +3,7 @@ info:
   title: Recipes API
   version: '1.0'
 servers:
-  - url: http://18.159.97.237:3000
+  - url: http://3.76.98.58
     description: Local server
 
 components:
