@@ -5,8 +5,8 @@ info:
 servers:
   - url: http://localhost:3000
     description: Local server
-  - url: https://recipes-api-2023.ey.r.appspot.com/
-    description: Google Cloud App Engine
+  - url: https://hellorecipes.online
+    description: Production server
 
 components:
   schemas:
