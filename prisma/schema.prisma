@@ -10,8 +10,8 @@ datasource db {
 // COUNTRIES
 model Country {
   id         Int          @id @default(autoincrement())
-  code       String       @unique
-  country    String       @unique
+  code       String       @unique @db.VarChar(2)
+  country    String       @unique @db.VarChar(36)
   currency   Currency     @relation(fields: [currencyId], references: [id])
   currencyId Int
   languages  Language[]
@@ -21,23 +21,23 @@ model Country {
 
 model Currency {
   id       Int       @id @default(autoincrement())
-  code     String    @unique
-  currency String    @unique
-  symbol   String
+  code     String    @unique @db.VarChar(3)
+  currency String    @unique @db.VarChar(36)
+  symbol   String    @db.VarChar(3)
   country  Country[]
 }
 
 model Language {
   id       Int       @id @default(autoincrement())
   code     String    @unique @db.VarChar(2)
-  language String    @unique
+  language String    @unique @db.VarChar(36)
   country  Country[]
 }
 
 // INGREDIENTS
 model Ingredient {
-  id                   String                 @id @default(uuid())
-  ingredient           String                 @unique
+  id                   String                 @id @default(uuid()) @db.VarChar(36)
+  ingredient           String                 @unique @db.VarChar(36)
   type                 IngredientType         @relation(fields: [typeId], references: [id])
   typeId               Int
   unit                 MeasureUnit            @relation(fields: [unitId], references: [id])
@@ -48,19 +48,19 @@ model Ingredient {
 
 model MeasureUnit {
   id         Int          @id @default(autoincrement())
-  unit       String       @unique
+  unit       String       @unique @db.VarChar(36)
   ingredient Ingredient[]
 }
 
 model IngredientType {
   id         Int          @id @default(autoincrement())
-  type       String       @unique
+  type       String       @unique @db.VarChar(36)
   ingredient Ingredient[]
 }
 
 model Utensil {
   id      Int               @id @default(autoincrement())
-  utensil String            @unique
+  utensil String            @unique @db.VarChar(36)
   recipe  UtensilOnRecipe[]
 }
 
@@ -68,18 +68,18 @@ model UtensilOnRecipe {
   Utensil   Utensil @relation(fields: [utensilId], references: [id])
   utensilId Int
   Recipe    Recipe  @relation(fields: [recipeId], references: [id])
-  recipeId  String
+  recipeId  String  @db.VarChar(36)
   quantity  Int
 
   @@id([utensilId, recipeId])
 }
 
 model PriceLog {
-  id           String     @id @default(uuid())
+  id           String     @id @default(uuid()) @db.VarChar(36)
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId String
+  ingredientId String     @db.VarChar(36)
   marketUnit   MarketUnit @relation(fields: [marketUnitId], references: [id])
-  marketUnitId String
+  marketUnitId String     @db.VarChar(36)
   date         DateTime   @db.Date
   price        Decimal    @db.Money
 }
@@ -88,17 +88,17 @@ model PriceLog {
 
 model Market {
   id           Int            @id @default(autoincrement())
-  market       String         @unique
-  observations String?
+  market       String         @unique @db.VarChar(36)
+  observations String?        @db.VarChar(255)
   units        MarketUnit[]
   ShoppingList ShoppingList[]
 }
 
 model MarketUnit {
-  id          String            @id @default(uuid())
-  unitName    String            @unique
-  address     String?
-  coordinates String?
+  id          String            @id @default(uuid()) @db.VarChar(36)
+  unitName    String            @unique @db.VarChar(36)
+  address     String?           @db.VarChar(255)
+  coordinates String?           @db.VarChar(255)
   market      Market            @relation(fields: [marketId], references: [id])
   marketId    Int
   country     Country           @relation(fields: [countryId], references: [id])
@@ -109,24 +109,24 @@ model MarketUnit {
 
 model DeliveryContact {
   id           Int        @id @default(autoincrement())
-  site         String?
-  phone        String?
+  site         String?    @db.VarChar(255)
+  phone        String?    @db.VarChar(36)
   marketUnit   MarketUnit @relation(fields: [marketUnitId], references: [id])
-  marketUnitId String
+  marketUnitId String     @db.VarChar(36)
 }
 
 // RECIPES
 
 model Recipe {
-  id                    String                  @id @default(uuid())
-  title                 String
+  id                    String                  @id @default(uuid()) @db.VarChar(36)
+  title                 String                  @db.VarChar(255)
   author                User                    @relation(fields: [authorId], references: [id])
-  authorId              String
+  authorId              String                  @db.VarChar(36)
   difficulty            RecipeLevel?            @relation(fields: [recipeLevelId], references: [id])
   recipeLevelId         Int?
-  servings              Int
+  servings              Int                     @default(4)
   category              Category[]
-  template              String?
+  template              String?                 @db.VarChar(255)
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
   ingredientsOnRecipes  IngredientsOnRecipes[]
@@ -136,9 +136,9 @@ model Recipe {
 
 model IngredientsOnRecipes {
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId String
+  ingredientId String     @db.VarChar(36)
   recipe       Recipe     @relation(fields: [recipeId], references: [id])
-  recipeId     String
+  recipeId     String     @db.VarChar(36)
   quantity     Int
 
   @@id([ingredientId, recipeId])
@@ -146,23 +146,23 @@ model IngredientsOnRecipes {
 
 model Category {
   id       Int      @id @default(autoincrement())
-  category String   @unique
+  category String   @unique @db.VarChar(36)
   recipe   Recipe[]
 }
 
 model RecipeLevel {
   id     Int      @id @default(autoincrement())
-  level  String   @unique
+  level  String   @unique @db.VarChar(36)
   recipe Recipe[]
 }
 
 // SHOPPING LIST
 
 model ShoppingList {
-  id                    String                  @id @default(uuid())
-  title                 String                  @default("My Shopping List")
+  id                    String                  @id @default(uuid()) @db.VarChar(36)
+  title                 String                  @default("My Shopping List") @db.VarChar(255)
   author                User                    @relation(fields: [authorId], references: [id])
-  authorId              String
+  authorId              String                  @db.VarChar(36)
   recipesOnShoppingList RecipesOnShoppingList[]
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
@@ -172,9 +172,9 @@ model ShoppingList {
 
 model RecipesOnShoppingList {
   recipe         Recipe       @relation(fields: [recipeId], references: [id])
-  recipeId       String
+  recipeId       String       @db.VarChar(36)
   shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id])
-  shoppingListId String
+  shoppingListId String       @db.VarChar(36)
   servings       Int
 
   @@id([recipeId, shoppingListId])
@@ -183,15 +183,15 @@ model RecipesOnShoppingList {
 // USERS
 
 model User {
-  id             String         @id @default(uuid())
-  email          String         @unique
-  username       String         @unique
-  hashedPassword String
-  fullName       String?
-  address        String?
-  city           String?
+  id             String         @id @default(uuid()) @db.VarChar(36)
+  email          String         @unique @db.VarChar(255)
+  username       String         @unique @db.VarChar(36)
+  hashedPassword String         @db.VarChar(100)
+  fullName       String?        @db.VarChar(255)
+  address        String?        @db.VarChar(255)
+  city           String?        @db.VarChar(36)
   country        Country        @relation(fields: [countryId], references: [id])
-  avatar         String?
+  avatar         String?        @db.VarChar(2000)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   role           Role           @default(USER)
@@ -202,10 +202,10 @@ model User {
 }
 
 model Token {
-  id        String   @id @default(uuid())
-  token     String   @unique
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  token     String
   user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  userId    String   @db.VarChar(36)
   createdAt DateTime @default(now())
 }
 
