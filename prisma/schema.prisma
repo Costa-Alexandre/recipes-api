@@ -59,9 +59,19 @@ model IngredientType {
 }
 
 model Utensil {
-  id      Int      @id
-  utensil String   @unique
-  recipe  Recipe[]
+  id      Int               @id @default(autoincrement())
+  utensil String            @unique
+  recipe  UtensilOnRecipe[]
+}
+
+model UtensilOnRecipe {
+  Utensil   Utensil @relation(fields: [utensilId], references: [id])
+  utensilId Int
+  Recipe    Recipe  @relation(fields: [recipeId], references: [id])
+  recipeId  String
+  quantity  Int
+
+  @@id([utensilId, recipeId])
 }
 
 model PriceLog {
@@ -116,12 +126,11 @@ model Recipe {
   recipeLevelId         Int?
   servings              Int
   category              Category[]
-  image                 String?
-  instructions          String?
+  template              String?
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
   ingredientsOnRecipes  IngredientsOnRecipes[]
-  utensils              Utensil[]
+  utensils              UtensilOnRecipe[]
   RecipesOnShoppingList RecipesOnShoppingList[]
 }
 
