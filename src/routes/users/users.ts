@@ -125,12 +125,12 @@ router.route(`/:username`)
 router.route(`/token/refresh`)
   .post(async (req: Request, res: Response) => {
     try {
-      const { refreshToken } = req.body;
+      const { refreshToken }: { refreshToken: string } = req.body;
       if (!refreshToken) return res.status(401).json({ error: 'Unauthorized' });
       const decodedRefreshToken = verifyRefreshToken(refreshToken);
       console.log(decodedRefreshToken)
       if (!decodedRefreshToken) return res.status(401).json({ error: 'Unauthorized' });
-      const storedToken = await prisma.token.findUnique({
+      const storedToken = await prisma.token.findFirst({
         where: {
           token: refreshToken
         },
@@ -184,3 +184,4 @@ const verifyRefreshToken = (refreshToken: string): RefreshToken | null => {
 }
 
 export default router;
+

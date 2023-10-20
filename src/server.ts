@@ -1,9 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import express, { ErrorRequestHandler } from 'express';
-import { CountryRoutes, UserRoutes, LanguageRoutes } from './routes';
+import { CountryRoutes, UserRoutes, LanguageRoutes, PricesRoutes } from './routes';
 import swaggerDocs from './docs/swagger';
 import { reqLogger, errorLogger, logger } from './lib/logger';
-import https from 'https';
 
 
 export const prisma = new PrismaClient();
@@ -26,6 +25,7 @@ app.get('/health', (req, res) => {
 app.use('/countries', CountryRoutes);
 app.use('/users', UserRoutes)
 app.use('/languages', LanguageRoutes)
+app.use('/prices', PricesRoutes)
 
 app.use(errorLogger);
 
