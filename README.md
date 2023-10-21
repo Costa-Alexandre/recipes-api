@@ -273,7 +273,7 @@ Here is an Entity-Relationship Diagram (ERD) illustrating the key data models us
 
 ![ERD Diagram](static/Recipes.png)
 
-This diagram provides an overview of the data structure and relationships within the project's database.
+This diagram provides an overview of the data structure and relationships within the project's database. You can visualize and interact with this ERD at [dbdocs.io](https://dbdocs.io/alexandre.costa/recipes-api?view=relationships).
 
 ### Auto-Generating the ERD with dbdocs.io
 
