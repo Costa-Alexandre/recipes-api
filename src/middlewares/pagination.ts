@@ -32,8 +32,6 @@ export function paginatedResults() {
 
     (req as RequestWithPagination).paginationClause = paginationClause;
 
-    console.log('query', req.query)
-    console.log('paginationClause', paginationClause)
     next();
   }
 }
