@@ -179,34 +179,34 @@ PriceLogs are considered sensitive information for containing data about the use
 
 - **View a PriceLog:**
 
-  - [ ] Users can view their own PriceLogs
-  - [ ] Users can view aggregated PriceLogs data for a specific ingredient, without user information
-  - [ ] Admins can view all PriceLogs
+  - [x] Users can view their own PriceLogs
+  - [x] Users can view aggregated PriceLogs data for a specific ingredient, without user information
+  - [x] Admins can view all PriceLogs
 
 - **Search PriceLogs:**
 
-  - [ ] Users can search for PriceLog based on:
-    - [ ] ingredient name
-    - [ ] market name
-    - [ ] market unit
-    - [ ] date range
-    - [ ] location
+  - [x] Users can search for PriceLog based on:
+    - [x] ingredient name
+    - [x] market name
+    - [x] market unit
+    - [x] date range
+    - [x] location
 
 - **Aggregate PriceLogs:**
-  - [ ] Users can get price estimations for a specific ingredient, using aggregation functions in queries filtered by:
-    - [ ] market
-    - [ ] market unit
-    - [ ] location
-    - [ ] date range
+  - [x] Users can get price estimations for a specific ingredient, using aggregation functions in queries filtered by:
+    - [x] market
+    - [x] market unit
+    - [x] location
+    - [x] date range
 
 #### PriceLog Integrity
 
 - **PriceLog Constraints:**
-  - [ ] A PriceLog must have a valid ingredient
-  - [ ] A PriceLog must have a valid market unit
-  - [ ] A PriceLog must have a valid user
-  - [ ] A PriceLog must have a valid price
-  - [ ] A PriceLog must have a valid date
+  - [x] A PriceLog must have a valid ingredient
+  - [x] A PriceLog must have a valid market unit
+  - [x] A PriceLog must have a valid user
+  - [x] A PriceLog must have a valid price
+  - [x] A PriceLog must have a valid date
 
 ### User
 
