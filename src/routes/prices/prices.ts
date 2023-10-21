@@ -15,6 +15,9 @@ const paramsSchema = z.object({
   initialDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
   countryCode: z.string().regex(/^[a-z]{2}$/).optional()
+}).refine(data => (data.initialDate != undefined && data.endDate != undefined) ? data.initialDate <= data.endDate : true, {
+  message: 'Initial date must be less than or equal to end date',
+  path: ['initialDate', 'endDate'],
 })
 
 const router = express.Router();
@@ -131,7 +134,7 @@ router.route(`/`)
     }
   })
 
-router.route(`/:username`)
+router.route(`/user/:username`)
   .get(authenticateToken('USER'), paginatedResults(), async (req: Request, res: Response, next: NextFunction) => {
 
     const loggedUser = loggedUserMatchesParam(req);
@@ -242,6 +245,84 @@ router.route(`/:username`)
           limit: paginationClause.take
         },
         flatPrices
+      }
+      res.status(200).json(results);
+    } catch (error) {
+      next(error)
+    }
+  })
+
+router.route(`/ingredient/:ingredient`)
+  .get(authenticateToken('USER'), async (req: Request, res: Response, next: NextFunction) => {
+
+    const { market, unitName, initialDate, endDate, countryCode } = req.query;
+    const { ingredient } = req.params;
+    const validationResult = paramsSchema.safeParse({ ingredient, market, unitName, initialDate, endDate, countryCode })
+
+    if (!validationResult.success) {
+      logger.warn(`Schema validation error. ${validationResult.error}`)
+      return res.status(400).json({ error: `Schema validation error.` })
+    }
+
+    const { data } = validationResult
+    const { ingredient: ingredientParsed, market: marketParsed, unitName: unitNameParsed, initialDate: initialDateParsed, endDate: endDateParsed, countryCode: countryCodeParsed } = data
+
+    const whereClause: Prisma.PriceLogWhereInput = {
+      ingredient: {
+        ingredient: {
+          equals: ingredientParsed,
+          mode: 'insensitive'
+        }
+      },
+      marketUnit: {
+        market: {
+          market: {
+            equals: marketParsed,
+            mode: 'insensitive'
+          }
+        },
+        unitName: {
+          contains: unitNameParsed,
+          mode: 'insensitive'
+        },
+        country: {
+          code: {
+            equals: countryCodeParsed,
+            mode: 'insensitive'
+          }
+        }
+      },
+      date: {
+        gte: initialDateParsed,
+        lte: endDateParsed
+      },
+    }
+
+    try {
+
+      const prices = await prisma.priceLog.aggregate({
+        where: whereClause,
+        _count: {
+          id: true,
+        },
+        _avg: {
+          price: true
+        },
+        _min: {
+          price: true
+        },
+        _max: {
+          price: true
+        },
+      })
+
+      const queryParams = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== undefined));
+      const results = {
+        totalResults: prices._count.id,
+        queryParams,
+        averagePrice: prices._avg.price?.toFixed(2),
+        minPrice: prices._min.price,
+        maxPrice: prices._max.price,
       }
       res.status(200).json(results);
     } catch (error) {
