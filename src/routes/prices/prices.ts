@@ -1,11 +1,12 @@
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
-import { RequestWithUser } from '../../types';
+import { RequestWithPagination } from '../../types';
 import { prisma } from '../../server';
 import { authenticateToken } from '../../auth/auth';
 import { z } from 'zod';
 import { logger } from '../../lib/logger'
 import { Prisma } from '@prisma/client';
+import { paginatedResults } from '../../middlewares/pagination';
 
 const paramsSchema = z.object({
   ingredient: z.string().max(36).optional(),
@@ -16,21 +17,15 @@ const paramsSchema = z.object({
   countryCode: z.string().regex(/^[a-z]{2}$/).optional()
 })
 
-const paginationSchema = z.object({
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().lte(20).optional(),
-})
-
-
 const router = express.Router();
 
 router.route(`/`)
 
-  .get(authenticateToken("ADMIN"), async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  .get(authenticateToken('ADMIN'), paginatedResults(), async (req: Request, res: Response, next: NextFunction) => {
+    const { paginationClause } = req as RequestWithPagination;
     const { ingredient, market, unitName, initialDate, endDate, countryCode, page, limit } = req.query;
     const validationResult = paramsSchema.safeParse({ ingredient, market, unitName, initialDate, endDate, countryCode })
-    const paginationParams = paginationSchema.safeParse({ page, limit })
-    console.log(paginationParams)
+
     if (!validationResult.success) {
       logger.warn(`Schema validation error. ${validationResult.error}`)
       return res.status(400).json({ error: `Schema validation error.` })
@@ -96,18 +91,6 @@ router.route(`/`)
       },
     } satisfies Prisma.PriceLogSelect
 
-    const paginationClause = {
-      skip: 0,
-      take: 20
-    }
-    if (paginationParams.success) {
-      const pageParsed = paginationParams.data.page ?? 1;
-      const limitParsed = paginationParams.data.limit ?? 20;
-
-      paginationClause.skip = (pageParsed - 1) * limitParsed;
-      paginationClause.take = limitParsed;
-    }
-
     try {
 
       const [prices, countPrices] = await prisma.$transaction([prisma.priceLog.findMany({
@@ -132,7 +115,7 @@ router.route(`/`)
       const resultsLength = flatPrices.length;
       const queryParams = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== undefined));
       const results = {
-        resultLength: resultsLength,
+        resultsLength: resultsLength,
         totalResults: countPrices,
         queryParams,
         paginationParams: {
