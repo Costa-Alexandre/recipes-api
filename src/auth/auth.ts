@@ -2,10 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from 'jsonwebtoken';
 import { logger } from '../lib/logger'
-
-interface RequestWithUser extends Request {
-  user?: string | JwtPayload;
-}
+import { RequestWithUser } from '../types';
 
 export function authenticateToken(minRole = 'ADMIN') {
   return (req: RequestWithUser, res: Response, next: NextFunction) => {
