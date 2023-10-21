@@ -2,7 +2,7 @@ import express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithPagination, RequestWithUser } from '../../types';
 import { prisma } from '../../server';
-import { authenticateToken } from '../../auth/auth';
+import { authenticateToken, loggedUserMatchesParam } from '../../auth/auth';
 import { z } from 'zod';
 import { logger } from '../../lib/logger'
 import { Prisma } from '@prisma/client';
@@ -133,11 +133,9 @@ router.route(`/`)
 
 router.route(`/:username`)
   .get(authenticateToken('USER'), paginatedResults(), async (req: Request, res: Response, next: NextFunction) => {
-    const { user: loggedUser } = req as RequestWithUser;
-    if (!loggedUser || typeof loggedUser === 'string') return res.status(401).json({ error: 'Unauthorized' });
-    const { username } = loggedUser;
-    const { username: requestParam } = req.params;
-    if (username !== requestParam) return res.status(401).json({ error: 'Unauthorized' });
+
+    const loggedUser = loggedUserMatchesParam(req);
+    if (!loggedUser) return res.status(401).json({ error: 'Unauthorized' });
 
     const { paginationClause } = req as RequestWithPagination;
     const { ingredient, market, unitName, initialDate, endDate, countryCode } = req.query;

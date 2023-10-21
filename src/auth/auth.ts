@@ -39,3 +39,12 @@ export function authenticateToken(minRole = 'ADMIN') {
     }
   }
 }
+
+export const loggedUserMatchesParam = (req: RequestWithUser) => {
+  const { user: loggedUser } = req;
+  if (!loggedUser || typeof loggedUser === 'string') return null;
+  const { username } = loggedUser;
+  const { username: requestParam } = req.params;
+  if (username !== requestParam) return null;
+  return loggedUser;
+}
