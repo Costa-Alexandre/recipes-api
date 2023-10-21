@@ -82,6 +82,8 @@ model PriceLog {
   marketUnitId String     @db.VarChar(36)
   date         DateTime   @db.Date
   price        Decimal    @db.Money
+  User         User?      @relation(fields: [userId], references: [id])
+  userId       String?    @db.VarChar(36)
 }
 
 // MARKETS
@@ -199,6 +201,7 @@ model User {
   countryId      Int
   Token          Token[]
   ShoppingList   ShoppingList[]
+  PriceLog       PriceLog[]
 }
 
 model Token {
