@@ -82,8 +82,8 @@ model PriceLog {
   marketUnitId String     @db.VarChar(36)
   date         DateTime   @db.Date
   price        Decimal    @db.Decimal(10, 2)
-  User         User?      @relation(fields: [userId], references: [id])
-  userId       String?    @db.VarChar(36)
+  User         User       @relation(fields: [userId], references: [id])
+  userId       String     @db.VarChar(36)
 }
 
 // MARKETS
