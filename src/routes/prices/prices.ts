@@ -1,24 +1,11 @@
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
-import { RequestWithPagination, RequestWithUser } from '../../types';
+import { RequestWithPagination } from '../../types';
 import { prisma } from '../../server';
 import { authenticateToken, loggedUserMatchesParam } from '../../auth/auth';
-import { z } from 'zod';
 import { logger } from '../../lib/logger'
-import { Prisma } from '@prisma/client';
 import { paginatedResults } from '../../middlewares/pagination';
-
-const paramsSchema = z.object({
-  ingredient: z.string().max(36).optional(),
-  market: z.string().max(36).optional(),
-  unitName: z.string().max(36).optional(),
-  initialDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
-  countryCode: z.string().regex(/^[a-z]{2}$/).optional()
-}).refine(data => (data.initialDate != undefined && data.endDate != undefined) ? data.initialDate <= data.endDate : true, {
-  message: 'Initial date must be less than or equal to end date',
-  path: ['initialDate', 'endDate'],
-})
+import { paramsSchema, getWhereClause, getFormattedPayload, selectClause as getSelectClause, getOrderByClause } from './utils';
 
 const router = express.Router();
 
@@ -26,8 +13,8 @@ router.route(`/`)
 
   .get(authenticateToken('ADMIN'), paginatedResults(), async (req: Request, res: Response, next: NextFunction) => {
     const { paginationClause } = req as RequestWithPagination;
-    const { ingredient, market, unitName, initialDate, endDate, countryCode, page, limit } = req.query;
-    const validationResult = paramsSchema.safeParse({ ingredient, market, unitName, initialDate, endDate, countryCode })
+    const { ingredient, market, unitName, initialDate, endDate, countryCode, orderBy } = req.query;
+    const validationResult = paramsSchema.safeParse({ ingredient, market, unitName, initialDate, endDate, countryCode, orderBy })
 
     if (!validationResult.success) {
       logger.warn(`Schema validation error. ${validationResult.error}`)
@@ -35,90 +22,25 @@ router.route(`/`)
     }
 
     const { data } = validationResult
-    const { ingredient: ingredientParsed, market: marketParsed, unitName: unitNameParsed, initialDate: initialDateParsed, endDate: endDateParsed, countryCode: countryCodeParsed } = data
-
-    const whereClause: Prisma.PriceLogWhereInput = {
-      ingredient: {
-        ingredient: {
-          equals: ingredientParsed,
-          mode: 'insensitive'
-        }
-      },
-      marketUnit: {
-        market: {
-          market: {
-            equals: marketParsed,
-            mode: 'insensitive'
-          }
-        },
-        unitName: {
-          contains: unitNameParsed,
-          mode: 'insensitive'
-        },
-        country: {
-          code: {
-            equals: countryCodeParsed,
-            mode: 'insensitive'
-          }
-        }
-      },
-      date: {
-        gte: initialDateParsed,
-        lte: endDateParsed
-      },
-    }
-
-    const selectClause = {
-      id: true,
-      date: true,
-      price: true,
-      marketUnit: {
-        select: {
-          market: {
-            select: {
-              market: true
-            }
-          },
-          unitName: true,
-          country: {
-            select: {
-              code: true
-            }
-          }
-        }
-      },
-      ingredient: {
-        select: {
-          ingredient: true
-        }
-      },
-    } satisfies Prisma.PriceLogSelect
+    const whereClause = getWhereClause(data)
+    const selectClause = getSelectClause
+    const orderByClause = getOrderByClause(data)
 
     try {
-
       const [prices, countPrices] = await prisma.$transaction([prisma.priceLog.findMany({
         where: whereClause,
         select: selectClause,
         skip: paginationClause.skip,
         take: paginationClause.take,
+        orderBy: orderByClause
       }), prisma.priceLog.count({ where: whereClause })])
 
-      const flatPrices = prices.map((log) => {
-        return {
-          id: log.id,
-          date: log.date,
-          ingredient: log.ingredient.ingredient,
-          price: log.price,
-          unitName: log.marketUnit.unitName,
-          market: log.marketUnit.market.market,
-          country: log.marketUnit.country.code,
-        }
-      })
+      const formattedPriceLogs = getFormattedPayload(prices)
 
-      const resultsLength = flatPrices.length;
+      const queryResults = formattedPriceLogs.length;
       const queryParams = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== undefined));
       const results = {
-        resultsLength: resultsLength,
+        queryResults: queryResults,
         totalResults: countPrices,
         queryParams,
         paginationParams: {
@@ -126,7 +48,7 @@ router.route(`/`)
           lastPage: Math.ceil(countPrices / paginationClause.take),
           limit: paginationClause.take
         },
-        flatPrices
+        priceLogs: formattedPriceLogs
       }
       res.status(200).json(results);
     } catch (error) {
@@ -141,8 +63,8 @@ router.route(`/user/:username`)
     if (!loggedUser) return res.status(401).json({ error: 'Unauthorized' });
 
     const { paginationClause } = req as RequestWithPagination;
-    const { ingredient, market, unitName, initialDate, endDate, countryCode } = req.query;
-    const validationResult = paramsSchema.safeParse({ ingredient, market, unitName, initialDate, endDate, countryCode })
+    const { ingredient, market, unitName, initialDate, endDate, countryCode, orderBy } = req.query;
+    const validationResult = paramsSchema.safeParse({ ingredient, market, unitName, initialDate, endDate, countryCode, orderBy })
 
     if (!validationResult.success) {
       logger.warn(`Schema validation error. ${validationResult.error}`)
@@ -150,93 +72,30 @@ router.route(`/user/:username`)
     }
 
     const { data } = validationResult
-    const { ingredient: ingredientParsed, market: marketParsed, unitName: unitNameParsed, initialDate: initialDateParsed, endDate: endDateParsed, countryCode: countryCodeParsed } = data
 
-    const whereClause: Prisma.PriceLogWhereInput = {
-      ingredient: {
-        ingredient: {
-          equals: ingredientParsed,
-          mode: 'insensitive'
-        }
-      },
-      marketUnit: {
-        market: {
-          market: {
-            equals: marketParsed,
-            mode: 'insensitive'
-          }
-        },
-        unitName: {
-          contains: unitNameParsed,
-          mode: 'insensitive'
-        },
-        country: {
-          code: {
-            equals: countryCodeParsed,
-            mode: 'insensitive'
-          }
-        }
-      },
-      date: {
-        gte: initialDateParsed,
-        lte: endDateParsed
-      },
-      User: {
-        username: loggedUser.username
-      }
+    const whereClause = getWhereClause(data)
+    whereClause.User = {
+      username: loggedUser.username
     }
 
-    const selectClause = {
-      id: true,
-      date: true,
-      price: true,
-      marketUnit: {
-        select: {
-          market: {
-            select: {
-              market: true
-            }
-          },
-          unitName: true,
-          country: {
-            select: {
-              code: true
-            }
-          }
-        }
-      },
-      ingredient: {
-        select: {
-          ingredient: true
-        }
-      },
-    } satisfies Prisma.PriceLogSelect
+    const selectClause = getSelectClause
+    const orderByClause = getOrderByClause(data)
 
     try {
-
       const [prices, countPrices] = await prisma.$transaction([prisma.priceLog.findMany({
         where: whereClause,
         select: selectClause,
         skip: paginationClause.skip,
         take: paginationClause.take,
+        orderBy: orderByClause
       }), prisma.priceLog.count({ where: whereClause })])
 
-      const flatPrices = prices.map((log) => {
-        return {
-          id: log.id,
-          date: log.date,
-          ingredient: log.ingredient.ingredient,
-          price: log.price,
-          unitName: log.marketUnit.unitName,
-          market: log.marketUnit.market.market,
-          country: log.marketUnit.country.code,
-        }
-      })
+      const formattedPriceLogs = getFormattedPayload(prices)
 
-      const resultsLength = flatPrices.length;
+      const queryResults = formattedPriceLogs.length;
       const queryParams = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== undefined));
       const results = {
-        resultsLength: resultsLength,
+        queryResults: queryResults,
         totalResults: countPrices,
         queryParams,
         paginationParams: {
@@ -244,7 +103,7 @@ router.route(`/user/:username`)
           lastPage: Math.ceil(countPrices / paginationClause.take),
           limit: paginationClause.take
         },
-        flatPrices
+        priceLogs: formattedPriceLogs
       }
       res.status(200).json(results);
     } catch (error) {
@@ -265,41 +124,10 @@ router.route(`/ingredient/:ingredient`)
     }
 
     const { data } = validationResult
-    const { ingredient: ingredientParsed, market: marketParsed, unitName: unitNameParsed, initialDate: initialDateParsed, endDate: endDateParsed, countryCode: countryCodeParsed } = data
 
-    const whereClause: Prisma.PriceLogWhereInput = {
-      ingredient: {
-        ingredient: {
-          equals: ingredientParsed,
-          mode: 'insensitive'
-        }
-      },
-      marketUnit: {
-        market: {
-          market: {
-            equals: marketParsed,
-            mode: 'insensitive'
-          }
-        },
-        unitName: {
-          contains: unitNameParsed,
-          mode: 'insensitive'
-        },
-        country: {
-          code: {
-            equals: countryCodeParsed,
-            mode: 'insensitive'
-          }
-        }
-      },
-      date: {
-        gte: initialDateParsed,
-        lte: endDateParsed
-      },
-    }
+    const whereClause = getWhereClause(data)
 
     try {
-
       const prices = await prisma.priceLog.aggregate({
         where: whereClause,
         _count: {
@@ -331,3 +159,5 @@ router.route(`/ingredient/:ingredient`)
   })
 
 export default router;
+
+
