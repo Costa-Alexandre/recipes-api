@@ -35,7 +35,17 @@ export function authenticateToken(minRole = 'ADMIN') {
       req.user = user
       next();
     } catch (error) {
-      return next(error);
+      if (error instanceof jwt.TokenExpiredError) {
+        const message = 'Unauthorized: Authentication token expired'
+        logger.warn(message)
+        return res.status(401).json({ error: message });
+      } else if (error instanceof jwt.JsonWebTokenError) {
+        const message = 'Unauthorized: Invalid authentication token'
+        logger.warn(message)
+        return res.status(401).json({ error: message });
+      } else {
+        return next(error);
+      }
     }
   }
 }
