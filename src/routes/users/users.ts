@@ -76,7 +76,11 @@ router.route(`/login`)
         },
       })
 
-      if (!user) return res.status(400).json({ error: 'Invalid credentials' })
+      if (!user) {
+        // delay to prevent timing attacks
+        await bcrypt.compare(password, '$2b$10$9nZolFR07UHpls7bmPBLFe9mTPPXWBzdfXeT0NWWrSgXcZab1qMPG')
+        return res.status(400).json({ error: 'Invalid credentials' })
+      }
 
       const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
