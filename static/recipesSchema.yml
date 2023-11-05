@@ -310,3 +310,158 @@ paths:
           $ref: '#/components/responses/500'
       security:
         - bearerAuth: []
+
+  /prices:
+    get:
+      tags:
+        - PriceLogs
+      description: 'Get all price logs, optionally filtered by data, ingredient, market, market unit or country'
+      parameters:
+        - in: query
+          name: initialDate
+          schema:
+            type: string
+            format: date
+            example: '2023-01-01'
+          description: Initial date to filter by
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+            example: '2023-12-01'
+          description: End date to filter by
+        - in: query
+          name: ingredient
+          schema:
+            type: string
+            example: 'Potatoes'
+          description: Ingredient to filter by
+        - in: query
+          name: market
+          schema:
+            type: string
+            example: 'Rewe'
+          description: Market to filter by
+        - in: query
+          name: unitName
+          schema:
+            type: string
+            example: 'Rewe Am Tierpark'
+          description: Market unit to filter by
+        - in: query
+          name: countryCode
+          schema:
+            type: string
+            example: 'de'
+          description: Country to filter by
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            format: int64
+            example: 10
+          description: Maximum number of results to return. Default and maximum is 20
+        - in: query
+          name: page
+          schema:
+            type: integer
+            format: int64
+            example: 1
+          description: Page number to return. Default is 1
+        - in: query
+          name: orderBy
+          schema:
+            type: string
+            example: 'price:asc'
+          description: Field to order by. Options are date and price, either ascending or descending.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queryResults:
+                    type: integer
+                    description: The number of results returned.
+                  totalResults:
+                    type: integer
+                    description: The total number of results available.
+                  queryParams:
+                    type: object
+                    description: The query parameters used for the request.
+                    properties:
+                      ingredient:
+                        type: string
+                        description: The name of the ingredient being queried.
+                      market:
+                        type: string
+                        description: The name of the market being queried.
+                      unitName:
+                        type: string
+                        description: The name of the unit or store being queried.
+                      initialDate:
+                        type: string
+                        format: date-time
+                        description: The initial date range for the price logs.
+                      endDate:
+                        type: string
+                        format: date-time
+                        description: The end date range for the price logs.
+                      countryCode:
+                        type: string
+                        description: The country code for the location being queried.
+                      orderBy:
+                        type: string
+                        description: The sorting order for the retrieved results.
+                  paginationParams:
+                    type: object
+                    description: Pagination parameters for the results.
+                    properties:
+                      page:
+                        type: integer
+                        description: The current page.
+                      lastPage:
+                        type: integer
+                        description: The last available page.
+                      limit:
+                        type: integer
+                        description: The number of results per page.
+                  priceLogs:
+                    type: array
+                    description: An array of price log objects.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique identifier for the price log.
+                        date:
+                          type: string
+                          format: date-time
+                          description: The date of the price log.
+                        ingredient:
+                          type: string
+                          description: The name of the ingredient.
+                        price:
+                          type: string
+                          description: The price of the ingredient.
+                        unitName:
+                          type: string
+                          description: The name of the unit or store.
+                        market:
+                          type: string
+                          description: The market where the price was recorded.
+                        country:
+                          type: string
+                          description: The country code where the price was recorded.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - bearerAuth: []
