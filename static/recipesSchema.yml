@@ -130,6 +130,42 @@ components:
               country:
                 type: string
                 description: The country code where the price was recorded.
+    IngredientStats:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          description: The total number of logs for the ingredient.
+        queryParams:
+          type: object
+          description: The query parameters used for the request.
+          properties:
+            market:
+              type: string
+              description: The name of the market being queried.
+            unitName:
+              type: string
+              description: The name of the unit or store being queried.
+            initialDate:
+              type: string
+              format: date-time
+              description: The initial date range for the price logs.
+            endDate:
+              type: string
+              format: date-time
+              description: The end date range for the price logs.
+            countryCode:
+              type: string
+              description: The country code for the location being queried.
+        averagePrice:
+          type: string
+          description: The average price logged for the ingredient.
+        minPrice:
+          type: string
+          description: The minimum price logged for the ingredient.
+        maxPrice:
+          type: string
+          description: The maximum price logged for the ingredient.
   responses:
     '400':
       description: 'Schema validation error'
@@ -142,7 +178,7 @@ components:
                 type: string
                 example: Schema validation error
     '401':
-      description: 'Unauthorized: Authentication token missing'
+      description: 'Unauthorized: Authentication token missing / expired / invalid'
       content:
         application/json:
           schema:
@@ -182,7 +218,7 @@ components:
                 type: string
                 example: Internal Server Error
   parameters:
-    QueryParameters:
+    initialDate:
       in: query
       name: initialDate
       schema:
@@ -200,6 +236,14 @@ components:
       description: End date to filter by
     ingredient:
       in: query
+      name: ingredient
+      schema:
+        type: string
+        example: 'Potatoes'
+      description: Ingredient to filter by
+    ingredientPath:
+      in: path
+      required: true
       name: ingredient
       schema:
         type: string
@@ -467,12 +511,13 @@ paths:
     get:
       tags:
         - PriceLogs
-      description: 'Get all price logs, optionally filtered by data, ingredient, market, market unit or country'
+      description: 'Get all price logs, optionally filtered by date, ingredient, market, market unit or country'
       parameters:
-        - $ref: '#/components/parameters/QueryParameters'
         - $ref: '#/components/parameters/ingredient'
         - $ref: '#/components/parameters/market'
         - $ref: '#/components/parameters/unitName'
+        - $ref: '#/components/parameters/initialDate'
+        - $ref: '#/components/parameters/endDate'
         - $ref: '#/components/parameters/countryCode'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/page'
@@ -484,6 +529,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceLogs'
+        '400':
+          $ref: '#/components/responses/400'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -497,13 +544,14 @@ paths:
     get:
       tags:
         - PriceLogs
-      description: 'Get all price logs for a user'
+      description: 'Get all price logs for a user, optionally filtered by date, ingredient, market, market unit or country'
       parameters:
         - $ref: '#/components/parameters/username'
-        - $ref: '#/components/parameters/QueryParameters'
         - $ref: '#/components/parameters/ingredient'
         - $ref: '#/components/parameters/market'
         - $ref: '#/components/parameters/unitName'
+        - $ref: '#/components/parameters/initialDate'
+        - $ref: '#/components/parameters/endDate'
         - $ref: '#/components/parameters/countryCode'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/page'
@@ -515,10 +563,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceLogs'
+        '400':
+          $ref: '#/components/responses/400'
         '401':
           $ref: '#/components/responses/401'
         '403':
           $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - bearerAuth: []
+
+  /prices/ingredient/{ingredient}:
+    get:
+      tags:
+        - PriceLogs
+      description: 'Get stats for an ingredient, optionally filtered by date, market, market unit or country'
+      parameters:
+        - $ref: '#/components/parameters/ingredientPath'
+        - $ref: '#/components/parameters/market'
+        - $ref: '#/components/parameters/unitName'
+        - $ref: '#/components/parameters/initialDate'
+        - $ref: '#/components/parameters/endDate'
+        - $ref: '#/components/parameters/countryCode'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientStats'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
       security:

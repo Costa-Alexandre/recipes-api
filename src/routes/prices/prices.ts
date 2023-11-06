@@ -60,7 +60,7 @@ router.route(`/user/:username`)
   .get(authenticateToken('USER'), paginatedResults(), async (req: Request, res: Response, next: NextFunction) => {
 
     const loggedUser = loggedUserMatchesParam(req);
-    if (!loggedUser) return res.status(401).json({ error: 'Unauthorized' });
+    if (!loggedUser) return res.status(403).json({ error: 'Forbidden: Insufficient privileges to access this resource' });
 
     const { paginationClause } = req as RequestWithPagination;
     const { ingredient, market, unitName, initialDate, endDate, countryCode, orderBy } = req.query;
@@ -143,6 +143,9 @@ router.route(`/ingredient/:ingredient`)
           price: true
         },
       })
+
+      console.log('COUNT', prices._count.id)
+      if (prices._count.id === 0) return res.status(404).json({ error: `Not found` })
 
       const queryParams = Object.fromEntries(Object.entries(data).filter(([key, value]) => value !== undefined));
       const results = {
