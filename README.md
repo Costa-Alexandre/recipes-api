@@ -17,7 +17,7 @@ A RESTful API using Express, Prisma and PostgreSQL. This documentation is genera
 1. [Data Models](#data-models)
    - [Auto-Generating the ERD with dbdocs.io](#auto-generating-the-erd-with-dbdocsio)
 1. [API Documentation](#api-documentation)
-1. [Contributing](#contributing)
+1. [Contribution List](#contribution-list)
 1. [License](#license)
 
 ## Introduction
@@ -366,29 +366,28 @@ Additionally, the project is behind a Cloudflare proxy to provide additional sec
 
 For detailed API documentation, please visit the API Documentation available at `http://localhost:3000/docs`, on local development, or at `https://hellorecipes.online/docs/`, on production.
 
-## Contributing
+## Contribution List
 
-This section outlines guidelines and information for those looking to contribute to the project.
+This section contains a list of my main module-related (SE_05 Relational Databases) contributions
 
-### How to Contribute
-
-We welcome contributions from the community! To contribute to the project, follow these steps:
-
-1. Fork the repository and clone it to your local machine.
-1. Create a new branch for your feature or bug fix
-1. Make your modifications and ensure they adhere to the project's coding standards.
-1. Test your changes thoroughly. If possible, write unit tests for your changes.
-1. Commit your changes and push them to your fork.
-1. Open a pull request in the project's repository and provide a detailed description of your changes.
-
-### Coding Guidelines
-
-Adhere to the project's coding style and guidelines. Refer to the existing codebase for examples. Format and lint your code before committing your changes.
-
-### Reporting Issues
-
-If you encounter bugs or have suggestions, please [open an issue](https://github.com/Costa-Alexandre/recipes-api/issues) on the project's GitHub repository.
-Please check the existing issues to ensure your issue has not already been reported.
+- [x] Application of the concepts of relational databases to the project
+- [x] Design and implementation of the database schema, including the definition of tables, columns, primary and foreign keys, and relationships
+- [x] Correct use of data types
+- [x] Normalization of the database schema
+- [ ] Correct use of indexes
+- [x] Enforcing data integrity through the use of constraints
+- [x] Correct use of SQL statements
+- [x] Correct use of the ORM framework (Prisma) to perform CRUD operations
+- [x] Correct use of the ORM framework (Prisma) to perform complex queries (e.g., aggregations, filtering, sorting)
+- [x] Limiting the amount of data returned by queries (pagination)
+- [x] Prevention for SQL injection attacks with the use of server-side input validation (Zod)
+- [x] Properly handling errors and exceptions
+- [x] Prevention for broken object level authorization (BOLA)
+- [x] Securely managing user sessions (short-lived JWT, refresh tokens) and access control (role-based access control)
+- [x] Securely managing user passwords (hashing with cost factor, salting)
+- [x] Application of transport layer security (HTTPS) and subnetwork isolation (VPC)
+- [x] Use of Cloudflare proxy to provide additional security against DDoS and performance benefits
+- [ ] Database backup and recovery
 
 ## License
 
