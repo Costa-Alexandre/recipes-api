@@ -127,11 +127,11 @@ This section outlines the various use cases and functionalities supported by the
 #### Recipe Integrity
 
 - **Recipe Constraints:**
-  - [x] A recipe must always have:
+  - [x] A recipe must have:
     - [x] an uuid
-    - [x] a title
-    - [x] an author
-    - [x] a number of servings
+    - [x] a non-blank title
+    - [x] a valid author (user)
+    - [x] a positive number of servings
     - [x] created at and updated at dates
 
 ### Ingredient
@@ -160,8 +160,11 @@ This section outlines the various use cases and functionalities supported by the
 #### Ingredient Integrity
 
 - **Ingredient Constraints:**
-  - [ ] An ingredient must have an unique name
-  - [ ] An ingredient must have a single measuring unit
+- [x] An ingredient must have:
+  - [x] an uuid
+  - [x] a unique non-blank name
+  - [x] only one measuring unit
+  - [x] only on valid type
 
 ### PriceLog
 
@@ -203,11 +206,13 @@ PriceLogs are considered sensitive information for containing data about the use
 #### PriceLog Integrity
 
 - **PriceLog Constraints:**
-  - [x] A PriceLog must have a valid ingredient
-  - [x] A PriceLog must have a valid market unit
-  - [x] A PriceLog must have a valid user
-  - [x] A PriceLog must have a valid price
-  - [x] A PriceLog must have a valid date
+- [x] A PriceLog must have:
+  - [x] an uuid
+  - [x] a valid ingredient
+  - [x] a valid market unit
+  - [x] a valid user
+  - [x] a positive price
+  - [x] a valid date
 
 ### User
 
@@ -228,13 +233,13 @@ PriceLogs are considered sensitive information for containing data about the use
 #### User Integrity
 
 - **User Constraints:**
-
-  - [ ] A user must have a unique username
-  - [ ] A user must have a unique email
-  - [ ] A user must have a valid and hashed password with exactly 60 characters and starting with `$2b$10$`
-  - [ ] A user must have a country
-  - [ ] A user must have a valid role
-  - [ ] A user must have created at and updated at dates
+- [x] A user must have:
+  - [x] a unique username
+  - [x] a unique and valid email
+  - [x] a valid and hashed password with exactly 60 characters and starting with `$2b$10$`
+  - [x] a valid country
+  - [x] a valid role (user, editor or admin)
+  - [x] valid created at and updated at dates
 
 ### ShoppingList
 
