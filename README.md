@@ -95,7 +95,9 @@ This section outlines the various use cases and functionalities supported by the
 #### Recipe Management
 
 - **Create Recipes:**
+
   - [ ] Users can create new recipes
+
 - **Edit Recipes:**
 
   - [ ] Users can modify only their own recipes
@@ -118,6 +120,7 @@ This section outlines the various use cases and functionalities supported by the
     - [ ] difficulty level
     - [ ] author
     - [ ] title
+    - [ ] date of creation
 
   - [ ] Users can filter recipes based on:
     - [ ] required utensils
@@ -155,7 +158,7 @@ This section outlines the various use cases and functionalities supported by the
 - **Search Ingredients:**
   - [ ] Users can search for ingredients based on:
     - [ ] name
-    - [ ] category
+    - [ ] type
 
 #### Ingredient Integrity
 
@@ -220,13 +223,13 @@ PriceLogs are considered sensitive information for containing data about the use
 
 - **Authentication and Authorization:**
 
-  - [ ] Users can log in and receive authentication tokens
-  - [ ] Users receive a refresh token valid for 7 days on login
-  - [ ] Authentication tokens are valid for 1 hour and can be refreshed
-  - [ ] Users have limited access, mainly to public and authenticated views restricted to their data.
-  - [ ] Editors have all permissions as the users, with additional privileges:
+  - [x] Users can log in and receive authentication tokens
+  - [x] Users receive a refresh token valid for 7 days on login
+  - [x] Authentication tokens are valid for 15 min and can be refreshed
+  - [x] Users have limited access, mainly to public and authenticated views restricted to their data.
+  - [x] Editors have all permissions as the users, with additional privileges:
     - [ ] Editors can access, edit or delete all recipes, ingredients, market, market units and other non-sensitive data
-  - [ ] Admins have all permissions as the editors, with additional privileges:
+  - [x] Admins have all permissions as the editors, with additional privileges:
     - [ ] Admins can create new editors and admins
     - [ ] Admins can access, edit or delete any data
 

@@ -91,7 +91,7 @@ router.route(`/login`)
         username: user.username,
         role: user.role,
       }
-      const token = jwt.sign(simpleUser, jwtSecret, { expiresIn: '1h' });
+      const token = jwt.sign(simpleUser, jwtSecret, { expiresIn: '15m' });
       const refreshToken = jwt.sign({ id }, jwtSecret, { expiresIn: '7d' });
 
       await prisma.token.create({
