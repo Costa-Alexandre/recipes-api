@@ -53,6 +53,8 @@ Before you can use this project, make sure you have the following prerequisites 
 
    Ensure you take note of the connection URL to your database (e.g.: `postgresql://johndoe:randompassword@localhost:5432/mydb`)
 
+   Read more here about [PostgreSQL connection URL](https://www.prisma.io/docs/concepts/database-connectors/postgresql).
+
 2. **Clone the Repository:**
 
 `git clone https://github.com/Costa-Alexandre/recipes-api.git`
