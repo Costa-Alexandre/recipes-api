@@ -36,7 +36,7 @@ model Language {
 
 // INGREDIENTS
 model Ingredient {
-  id                   String                 @id @default(uuid()) @db.VarChar(36)
+  id                   String                 @id @default(uuid()) @db.Uuid
   ingredient           String                 @unique @db.VarChar(36)
   type                 IngredientType         @relation(fields: [typeId], references: [id])
   typeId               Int
@@ -68,22 +68,22 @@ model UtensilOnRecipe {
   Utensil   Utensil @relation(fields: [utensilId], references: [id])
   utensilId Int
   Recipe    Recipe  @relation(fields: [recipeId], references: [id])
-  recipeId  String  @db.VarChar(36)
+  recipeId  String  @db.Uuid
   quantity  Int
 
   @@id([utensilId, recipeId])
 }
 
 model PriceLog {
-  id           String     @id @default(uuid()) @db.VarChar(36)
+  id           String     @id @default(uuid()) @db.Uuid
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId String     @db.VarChar(36)
+  ingredientId String     @db.Uuid
   marketUnit   MarketUnit @relation(fields: [marketUnitId], references: [id])
-  marketUnitId String     @db.VarChar(36)
+  marketUnitId String     @db.Uuid
   date         DateTime   @db.Date
   price        Decimal    @db.Decimal(10, 2)
   User         User       @relation(fields: [userId], references: [id])
-  userId       String     @db.VarChar(36)
+  userId       String     @db.Uuid
 }
 
 // MARKETS
@@ -97,7 +97,7 @@ model Market {
 }
 
 model MarketUnit {
-  id          String            @id @default(uuid()) @db.VarChar(36)
+  id          String            @id @default(uuid()) @db.Uuid
   unitName    String            @unique @db.VarChar(36)
   address     String?           @db.VarChar(255)
   coordinates String?           @db.VarChar(255)
@@ -114,16 +114,16 @@ model DeliveryContact {
   site         String?    @db.VarChar(255)
   phone        String?    @db.VarChar(36)
   marketUnit   MarketUnit @relation(fields: [marketUnitId], references: [id])
-  marketUnitId String     @db.VarChar(36)
+  marketUnitId String     @db.Uuid
 }
 
 // RECIPES
 
 model Recipe {
-  id                    String                  @id @default(uuid()) @db.VarChar(36)
+  id                    String                  @id @default(uuid()) @db.Uuid
   title                 String                  @db.VarChar(255)
   author                User                    @relation(fields: [authorId], references: [id])
-  authorId              String                  @db.VarChar(36)
+  authorId              String                  @db.Uuid
   difficulty            RecipeLevel?            @relation(fields: [recipeLevelId], references: [id])
   recipeLevelId         Int?
   servings              Int                     @default(4)
@@ -138,9 +138,9 @@ model Recipe {
 
 model IngredientsOnRecipes {
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId String     @db.VarChar(36)
+  ingredientId String     @db.Uuid
   recipe       Recipe     @relation(fields: [recipeId], references: [id])
-  recipeId     String     @db.VarChar(36)
+  recipeId     String     @db.Uuid
   quantity     Int
 
   @@id([ingredientId, recipeId])
@@ -161,10 +161,10 @@ model RecipeLevel {
 // SHOPPING LIST
 
 model ShoppingList {
-  id                    String                  @id @default(uuid()) @db.VarChar(36)
+  id                    String                  @id @default(uuid()) @db.Uuid
   title                 String                  @default("My Shopping List") @db.VarChar(255)
   author                User                    @relation(fields: [authorId], references: [id])
-  authorId              String                  @db.VarChar(36)
+  authorId              String                  @db.Uuid
   recipesOnShoppingList RecipesOnShoppingList[]
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
@@ -174,9 +174,9 @@ model ShoppingList {
 
 model RecipesOnShoppingList {
   recipe         Recipe       @relation(fields: [recipeId], references: [id])
-  recipeId       String       @db.VarChar(36)
+  recipeId       String       @db.Uuid
   shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id])
-  shoppingListId String       @db.VarChar(36)
+  shoppingListId String       @db.Uuid
   servings       Int
 
   @@id([recipeId, shoppingListId])
@@ -185,7 +185,7 @@ model RecipesOnShoppingList {
 // USERS
 
 model User {
-  id             String         @id @default(uuid()) @db.VarChar(36)
+  id             String         @id @default(uuid()) @db.Uuid
   email          String         @unique @db.VarChar(255)
   username       String         @unique @db.VarChar(36)
   hashedPassword String         @db.VarChar(100)
@@ -205,10 +205,10 @@ model User {
 }
 
 model Token {
-  id        String   @id @default(uuid()) @db.VarChar(36)
+  id        String   @id @default(uuid()) @db.Uuid
   token     String
   user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.VarChar(36)
+  userId    String   @db.Uuid
   createdAt DateTime @default(now())
 }
 
