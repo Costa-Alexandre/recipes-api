@@ -44,6 +44,9 @@ model Ingredient {
   unitId               Int
   ingredientsOnRecipes IngredientsOnRecipes[]
   priceLogs            PriceLog[]
+
+  @@index([typeId], name: "idx_ingredients_type")
+  @@index([ingredient], name: "idx_ingredients_ingredient")
 }
 
 model MeasureUnit {
@@ -72,6 +75,7 @@ model UtensilOnRecipe {
   quantity  Int
 
   @@id([utensilId, recipeId])
+  @@index([utensilId], name: "idx_utensil_on_recipe_utensil")
 }
 
 model PriceLog {
@@ -84,6 +88,13 @@ model PriceLog {
   price        Decimal    @db.Decimal(10, 2)
   User         User       @relation(fields: [userId], references: [id])
   userId       String     @db.Uuid
+
+  @@index([ingredientId], name: "idx_price_logs_ingredient")
+  @@index([marketUnitId], name: "idx_price_logs_market_unit")
+  @@index([date], name: "idx_price_logs_date")
+  @@index([userId], name: "idx_price_logs_user")
+  @@index([price])
+  @@index([ingredientId, marketUnitId, date, userId, price], name: "idx_price_logs_combined")
 }
 
 // MARKETS
@@ -107,6 +118,8 @@ model MarketUnit {
   countryId   Int
   contacts    DeliveryContact[]
   PriceLog    PriceLog[]
+
+  @@index([marketId])
 }
 
 model DeliveryContact {
@@ -134,6 +147,11 @@ model Recipe {
   ingredientsOnRecipes  IngredientsOnRecipes[]
   utensils              UtensilOnRecipe[]
   RecipesOnShoppingList RecipesOnShoppingList[]
+
+  @@index([recipeLevelId], name: "idx_recipes_level")
+  @@index([authorId], name: "idx_recipes_author")
+  @@index([title], name: "idx_recipes_title")
+  @@index([createdAt], name: "idx_recipes_created_at")
 }
 
 model IngredientsOnRecipes {
@@ -144,6 +162,7 @@ model IngredientsOnRecipes {
   quantity     Int
 
   @@id([ingredientId, recipeId])
+  @@index([ingredientId], name: "idx_ingredient_on_recipe_ingredient")
 }
 
 model Category {
@@ -170,6 +189,9 @@ model ShoppingList {
   updatedAt             DateTime                @updatedAt
   preferredMarkets      Market[]
   selectionCriteria     SelectionCriteria?
+
+  @@index([authorId], name: "idx_shopping_list_author")
+  @@index([title], name: "idx_shopping_list_title")
 }
 
 model RecipesOnShoppingList {
@@ -180,6 +202,7 @@ model RecipesOnShoppingList {
   servings       Int
 
   @@id([recipeId, shoppingListId])
+  @@index([recipeId], name: "idx_recipe_on_shopping_list_recipe")
 }
 
 // USERS

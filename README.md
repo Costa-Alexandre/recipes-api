@@ -377,7 +377,7 @@ This section contains a list of my main module-related (SE_05 Relational Databas
 - [x] Design and implementation of the database schema, including the definition of tables, columns, primary and foreign keys, and relationships
 - [x] Correct use of data types
 - [x] Normalization of the database schema
-- [ ] Correct use of indexes
+- [x] Correct use of indexes
 - [x] Enforcing data integrity through the use of constraints
 - [x] Correct use of SQL statements
 - [x] Correct use of the ORM framework (Prisma) to perform CRUD operations
