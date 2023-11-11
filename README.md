@@ -75,7 +75,7 @@ JWT_REFRESH=<another_secure_password>
 5. **Run Database Migrations:**
    Execute the following command to run Prisma database migrations:
 
-`npx prisma migrate`
+`npx prisma migrate dev`
 
 6. **Start the Express Server:**
    Start the Express server by running the following command:
