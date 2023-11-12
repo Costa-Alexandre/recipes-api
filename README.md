@@ -18,6 +18,8 @@ A RESTful API using Express, Prisma and PostgreSQL. This documentation is genera
    - [Auto-Generating the ERD with dbdocs.io](#auto-generating-the-erd-with-dbdocsio)
 1. [API Documentation](#api-documentation)
 1. [Contribution List](#contribution-list)
+   - [Relational Databases](#relational-databases)
+   - [Cyber Security](#cyber-security)
 1. [License](#license)
 
 ## Introduction
@@ -373,6 +375,8 @@ For detailed API documentation, please visit the API Documentation available at 
 
 ## Contribution List
 
+### Relational Databases
+
 This section contains a list of my main module-related (SE_05 Relational Databases) contributions
 
 - [x] Application of the concepts of relational databases to the project
@@ -384,15 +388,33 @@ This section contains a list of my main module-related (SE_05 Relational Databas
 - [x] Correct use of SQL statements
 - [x] Correct use of the ORM framework (Prisma) to perform CRUD operations
 - [x] Correct use of the ORM framework (Prisma) to perform complex queries (e.g., aggregations, filtering, sorting)
-- [x] Limiting the amount of data returned by queries (pagination)
-- [x] Prevention for SQL injection attacks with the use of server-side input validation (Zod)
+- [x] Limiting the amount of data returned by queries (pagination and server-side filtering)
+- [x] Prevention for SQL injection attacks with the use of an ORM (prisma) and server-side input validation (Zod)
 - [x] Properly handling errors and exceptions
 - [x] Prevention for broken object level authorization (BOLA)
 - [x] Securely managing user sessions (short-lived JWT, refresh tokens) and access control (role-based access control)
+- [x] Enforce strong password policies (e.g., password length, password complexity)
 - [x] Securely managing user passwords (hashing with cost factor, salting)
 - [x] Application of transport layer security (HTTPS) and subnetwork isolation (VPC)
 - [x] Use of Cloudflare proxy to provide additional security against DDoS and performance benefits
 - [ ] Database backup and recovery
+
+### Cyber Security
+
+This section contains a list of my main module-related (SE_09 Cyber Security) contributions
+
+- [x] Limiting the amount of data returned by queries (pagination and server-side filtering)
+- [x] Prevention for SQL injection attacks with the use of an ORM (prisma) and server-side input validation (Zod)
+- [x] Properly handling errors and exceptions
+- [x] Prevention for broken object level authorization (BOLA)
+- [x] Securely managing user sessions (short-lived JWT, refresh tokens) and access control (role-based access control)
+- [x] Enforce strong password policies with zxcvbn (e.g., password length, password complexity, common passwords)
+- [x] Preventing brute force attacks (e.g., rate limiting, sshguard)
+- [x] Securely managing user passwords (hashing with cost factor, salting)
+- [x] Application of transport layer security (HTTPS) and subnetwork isolation (VPC)
+- [x] Use of Cloudflare proxy to provide additional security against DDoS and performance benefits
+- [x] IAM policies to restrict access to AWS resources
+- [x] Implement least privilege principle
 
 ## License
 
