@@ -1,0 +1,642 @@
+{
+  "version": "2.0.4",
+  "summary": {
+    "title": "Recipes API Threat Model",
+    "owner": "Alex Costa",
+    "description": "A backend server providing a REST API",
+    "id": 0
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "id": 0,
+        "title": "Recipes STRIDE",
+        "diagramType": "STRIDE",
+        "placeholder": "New STRIDE diagram description",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.0.4",
+        "cells": [
+          {
+            "position": {
+              "x": 457.9999999999993,
+              "y": 625.9374999999976
+            },
+            "size": {
+              "width": 620,
+              "height": 290.62500000000017
+            },
+            "shape": "trust-boundary-box",
+            "attrs": {
+              "headerText": {
+                "text": "AWS"
+              }
+            },
+            "zIndex": -1,
+            "id": "d3e40bcf-90a9-49ce-b1d6-aac76811c1a9",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "AWS",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false
+            }
+          },
+          {
+            "position": {
+              "x": 332.99999999999955,
+              "y": 581.4062499999977
+            },
+            "size": {
+              "width": 840,
+              "height": 393.74999999999994
+            },
+            "shape": "trust-boundary-box",
+            "attrs": {
+              "headerText": {
+                "text": "Cloudflare"
+              }
+            },
+            "zIndex": -1,
+            "id": "7dbe79a3-0202-45ac-b640-e505fe546fce",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Cloudflare",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false
+            }
+          },
+          {
+            "position": {
+              "x": 23,
+              "y": 731.2499999999977
+            },
+            "size": {
+              "width": 150,
+              "height": 80
+            },
+            "attrs": {
+              "text": {
+                "text": "User"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 2,
+            "id": "0be8214a-1fee-4901-87e4-a3cbb527f56f",
+            "data": {
+              "type": "tm.Actor",
+              "name": "User",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "providesAuthentication": false,
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "id": "72b63a35-4978-4a5f-9068-7b231250cc1d",
+                  "title": "CWE-521: Weak Password Requirements",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Spoofing",
+                  "description": "The product does not require that users should have strong passwords, which makes it easier for attackers to compromise user accounts. ",
+                  "mitigation": "Enforcement of a minimum and maximum length\nRestrictions against password reuse\nRestrictions against using common passwords\nRestrictions against using contextual string in the password (e.g., user id, app name) ",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 22,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 940,
+              "y": 727.1875
+            },
+            "size": {
+              "width": 120,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "Database"
+              },
+              "topLine": {
+                "stroke": "red",
+                "strokeWidth": 3,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "stroke": "red",
+                "strokeWidth": 3,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "id": "63e4ed75-6a22-43cf-9c04-d07dc6d9c5d9",
+            "zIndex": 4,
+            "data": {
+              "type": "tm.Store",
+              "name": "Database",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "isALog": false,
+              "storesCredentials": true,
+              "isEncrypted": false,
+              "isSigned": false,
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "51074013-9e23-4267-a991-fc01d0354dce",
+                  "title": "Cryptographic Failures",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "The most sensitive data it stores is individual shopping habits and locations. Data at rest is sensitive",
+                  "mitigation": "- Encrypt data at rest\n- store passwords using bcrypt: strong adaptive and salted hashing functions with a work factor (delay factor) of 10 rounds",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 5,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 720,
+              "y": 687.1875
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Application Server"
+              },
+              "body": {
+                "stroke": "red",
+                "strokeWidth": 3,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 5,
+            "id": "a3364782-6467-4873-840c-b13aff315f72",
+            "data": {
+              "type": "tm.Process",
+              "name": "Application Server",
+              "description": "NODE Express server",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "privilegeLevel": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "031986ca-cebd-4dc0-86f7-1727ec1253b4",
+                  "title": "Broken Access Control",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Elevation of privilege",
+                  "description": "Access control enforces policy such that users cannot act outside of their intended permissions. Failures typically lead to unauthorized information disclosure, modification, or destruction of all data or performing a business function outside the user's limits.",
+                  "mitigation": "- Deny by default\n- Record ownership\n- Disable directory listing\n- Log access control failures, alert admins when appropriate\n- Rate limit API\n- Short-lived JWT",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 2,
+                  "score": ""
+                },
+                {
+                  "id": "81798c0e-6962-4313-81bb-13981fb7b796",
+                  "title": "Cryptographic Failures",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "The most sensitive data it stores is individual shopping habits and locations. Data in transit is mostly not relevant, since they are aggregated and non-individual. ",
+                  "mitigation": "- Enforce transit data encryption using directives like HTTP Strict Transport Security (HSTS)\n- secure and appropriate practice for hashing passwords\n\n",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 3,
+                  "score": ""
+                },
+                {
+                  "id": "18efaa18-45d4-41fa-baa0-53a62f445b08",
+                  "title": "API8:2019 Injection",
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "An application is vulnerable to attack when:\nUser-supplied data is not validated, filtered, or sanitized by the application.\nDynamic queries or non-parameterized calls without context-aware escaping are used directly in the interpreter.\nHostile data is used within object-relational mapping (ORM) search parameters to extract additional, sensitive records.\nHostile data is directly used or concatenated. The SQL or command contains the structure and malicious data in dynamic queries, commands, or stored procedures.\n",
+                  "mitigation": "- positive server-side input validation (Zod)\n- use an ORM (Prisma)\n- escape special characters \n- limit queries (pagination)",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 4,
+                  "score": ""
+                },
+                {
+                  "id": "aaed2b39-f75a-45dd-89d1-f1b1adf61cf2",
+                  "title": "Improper Error Handling",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Improper handling of errors can introduce a variety of security problems for a web site. The most common problem is when detailed internal error messages such as stack traces, database dumps, and error codes are displayed to the user (hacker). These messages reveal implementation details that should never be revealed. Such details can provide hackers important clues on potential flaws in the site and such messages are also disturbing to normal users.",
+                  "mitigation": "Catch all error",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 8,
+                  "score": ""
+                },
+                {
+                  "id": "04c1cc5c-04dd-461e-a5a3-860fb4240ac9",
+                  "title": "Frameable response (potential Clickjacking)",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Spoofing",
+                  "description": "If a page fails to set an appropriate X-Frame-Options or Content-Security-Policy HTTP header, it might be possible for a page controlled by an attacker to load it within an iframe. This may enable a clickjacking attack, in which the attacker's page overlays the target application's interface with a different interface provided by the attacker. By inducing victim users to perform actions such as mouse clicks and keystrokes, the attacker can cause them to unwittingly carry out actions within the application that is being targeted.",
+                  "mitigation": "The application should return a response header with the name X-Frame-Options and the value DENY to prevent framing altogether, or the value SAMEORIGIN to allow framing only by pages on the same origin as the response itself.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 9,
+                  "score": ""
+                },
+                {
+                  "id": "ed41b0ac-d122-4de5-a809-8268b2586771",
+                  "title": "API1:2019 Broken object level authorization",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Spoofing",
+                  "description": "Insufficient authorization validation of an object access request allows an attacker to perform an unauthorized action by reusing an access token. This threat is caused by an improper configuration of authorization validations.\n\n There are two main aspects to consider:\n\n    Access token integrity\n    Access control enforcement\n",
+                  "mitigation": "Access Token Integrity\n - validate that the token provided by the requesting client has not been tampered with (jsonwebtoken)\n\nAccess control enforcement\n- implement access control enforcement policies to evaluate each incoming API request against the access entitlements of the authorization token (middleware auth)",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 13,
+                  "score": ""
+                },
+                {
+                  "id": "43d98f6e-59a6-4331-82f5-93ec2736a4db",
+                  "title": "API2:2019 Broken user authentication",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Spoofing",
+                  "description": "Badly implemented user authentication policies allow for attackers to impersonate legitimate users by taking advantage of implementation flaws in authentication implementations. ",
+                  "mitigation": "- Use delegated authentication and authorization patterns and avoid passing passwords directly within an API request (jwt)\n- Always validate the signature of access credentials, and ensure that all access credentials used have a defined expiry time (jwt expiry time)\n- Prevent brute force attacks by setting quotas\n- use RBAC",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 14,
+                  "score": ""
+                },
+                {
+                  "id": "8d58fc63-cabc-4c2c-8e1d-a5b95f31650a",
+                  "title": "API3:2019 Excessive data exposure",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "A published API might expose more data than necessary, relying on the client app to perform the necessary filtering. If an attacker directly queries the underlying API, they are able to access sensitive data. ",
+                  "mitigation": "- Paginated query results, with default limit value\n- server-side filtering",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 15,
+                  "score": ""
+                },
+                {
+                  "id": "d68f9dda-5834-4a0f-9877-22808b1efee1",
+                  "title": "API5:2019 Broken function level authorization",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Tampering",
+                  "description": "An attacker can perform actions by sending requests to functions they are unauthorized to access",
+                  "mitigation": "-  implement “least privilege” default access entitlements\n- validate the URL path and verb of all API requests",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 18,
+                  "score": ""
+                },
+                {
+                  "id": "1c099cc8-34da-4215-977f-3e177ad7b31c",
+                  "title": "API6:2019 Mass assignment",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Unfiltered data provided via APIs to client apps allows attackers to guess object properties via requests, or to use endpoint naming conventions for clues on where to perform unauthorized modification or accessing of properties on data objects stored in the backend. ",
+                  "mitigation": "- OpenAPI Specification\n- Validate incoming requests against the data schema defined the OAS spec, including the basepath, verb, request message policy, and parameters",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 19,
+                  "score": ""
+                },
+                {
+                  "id": "bca0a0c5-da08-487b-afa1-28f2273af5fd",
+                  "title": "API7:2019 Security misconfiguration",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Security misconfiguration is commonly a result of insecure default configurations, incomplete or ad-hoc configurations, open cloud storage, misconfigured HTTP headers, unnecessary HTTP methods, permissive Cross-Origin resource sharing (CORS), and verbose error messages containing sensitive information. Attackers often attempt to find unpatched flaws, common endpoints, or unprotected files and directories to gain unauthorized access or knowledge of the system they want to attack. Security misconfigurations can not only expose sensitive user data, but also system details that may lead to full server compromise.\n\nExamples:\n- Misconfigured TLS\n- Error messages with stack traces\n- Unpatched systems\n- Exposed storage or server management panels",
+                  "mitigation": "",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 20,
+                  "score": ""
+                },
+                {
+                  "id": "78ad0899-5902-4484-8165-a127f8f1fee8",
+                  "title": "API10:2019 Insufficient logging & monitoring",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Repudiation",
+                  "description": "Insufficient logging, monitoring, and alerts allows attacks in progress to go undetected ",
+                  "mitigation": "- standardize and control logs verbosity, log levels, log integrity, centralized repository\n- Guarantee that every event should be traceable to its source, categorized by criticality and business impact \n- Security and operations stakeholders should be able to access and react to logs and events in real time",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 21,
+                  "score": ""
+                },
+                {
+                  "id": "42f8bd55-81f7-4e04-9d24-de9ac2bd4b8c",
+                  "title": "CWE-307: Improper Restriction of Excessive Authentication Attempts",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Elevation of privilege",
+                  "description": "The product does not implement sufficient measures to prevent multiple failed authentication attempts within a short time frame, making it more susceptible to brute force attacks. ",
+                  "mitigation": "- Disconnecting the user after a small number of failed attempts\n- Implementing a timeout\n- Locking out a targeted account\n- Requiring a computational task on the user's part. ",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 23,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 494,
+              "y": 697.1875
+            },
+            "size": {
+              "width": 120,
+              "height": 120
+            },
+            "attrs": {
+              "text": {
+                "text": "Web Server"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 6,
+            "id": "059518fb-e99e-4626-bd86-b16c967c79d3",
+            "data": {
+              "type": "tm.Process",
+              "name": "Web Server",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "privilegeLevel": "",
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "id": "79e6c127-e276-422e-b888-b6c91276b7f9",
+                  "title": "CWE-307: Improper Restriction of Excessive Authentication Attempts",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Elevation of privilege",
+                  "description": "The product does not implement sufficient measures to prevent multiple failed authentication attempts within a short time frame, making it more susceptible to SSH brute force attacks. ",
+                  "mitigation": "Implementing a timeout (SSHGuard - 120 seconds, 1.5 factor for each failed attempt)\nInbound rules (my IP only)",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 24,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1,
+                "targetMarker": {
+                  "name": "classic"
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Data Flow",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "protocol": "",
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "hasOpenThreats": false,
+              "threats": []
+            },
+            "id": "b1fbded1-c3fe-42c9-ab50-57ca8984a6e6",
+            "source": {
+              "cell": "059518fb-e99e-4626-bd86-b16c967c79d3"
+            },
+            "target": {
+              "cell": "a3364782-6467-4873-840c-b13aff315f72"
+            },
+            "vertices": [
+              {
+                "x": 640,
+                "y": 763.19
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1,
+                "targetMarker": {
+                  "name": "classic"
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Data Flow",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "protocol": "",
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "hasOpenThreats": false,
+              "threats": []
+            },
+            "id": "8004c55d-8fb0-4063-bfb5-f9344a7dc389",
+            "source": {
+              "cell": "a3364782-6467-4873-840c-b13aff315f72"
+            },
+            "target": {
+              "cell": "63e4ed75-6a22-43cf-9c04-d07dc6d9c5d9"
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1,
+                "targetMarker": {
+                  "name": "classic"
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Data Flow",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "protocol": "",
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "hasOpenThreats": false,
+              "threats": []
+            },
+            "id": "4538ba93-84d8-4c2d-be0d-a519127a2dda",
+            "labels": [
+              "Data Flow"
+            ],
+            "source": {
+              "x": 173,
+              "y": 767
+            },
+            "target": {
+              "cell": "68ece00d-0eef-48a4-b8b6-5a22d12496bd"
+            },
+            "vertices": [
+              {
+                "x": 270,
+                "y": 767
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1,
+                "targetMarker": {
+                  "name": "classic"
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Data Flow",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "protocol": "",
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "hasOpenThreats": false,
+              "threats": []
+            },
+            "id": "e54632b9-e0de-44c9-9658-da003586a947",
+            "source": {
+              "x": 420,
+              "y": 767
+            },
+            "target": {
+              "cell": "059518fb-e99e-4626-bd86-b16c967c79d3"
+            }
+          },
+          {
+            "position": {
+              "x": 360,
+              "y": 741.2499999999977
+            },
+            "size": {
+              "width": 60,
+              "height": 60
+            },
+            "attrs": {
+              "text": {
+                "text": "CF Edge"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 11,
+            "id": "68ece00d-0eef-48a4-b8b6-5a22d12496bd",
+            "data": {
+              "type": "tm.Process",
+              "name": "CF Edge",
+              "description": "",
+              "outOfScope": false,
+              "reasonOutOfScope": "",
+              "privilegeLevel": "",
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "id": "7c315a3d-1d39-42e2-8e46-d541c7649495",
+                  "title": "API4:2019 Lack of resources & rate limiting",
+                  "status": "Mitigated",
+                  "severity": "Medium",
+                  "type": "Denial of service",
+                  "description": "By not implementing rate limiting policies, attackers can overwhelm the backend with denial-of-service attacks. ",
+                  "mitigation": "- scan requests using HTTP headers, user agent, query string, path, host, HTTP method, HTTP version, TLS cipher version, and request rate. \n- check HTTP response metrics such as error codes\n- return cached queries",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 17,
+                  "score": ""
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "diagramTop": 1,
+    "reviewer": "",
+    "threatTop": 24
+  }
+}
